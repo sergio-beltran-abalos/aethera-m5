@@ -22,9 +22,23 @@ estudiante realmente puede cumplir**. Datos 100 % sintéticos del Data Pack de l
 
 | | |
 |---|---|
-| **Equipo** | *(completar antes de entregar)* |
-| **Integrantes** | *(nombres · universidad · carrera)* |
+| **Equipo** | Aethera Pulse + Ruta |
 | **Institución objetivo** | UNI_NOVA_AETHER (ver §7, escalabilidad) |
+| **Contacto** | Sergio Edmundo Beltran Abalos · sergio.beltran@utec.edu.pe |
+
+### Integrantes
+
+| # | Nombre | Institución | Rol |
+|---|---|---|---|
+| 1 | **Sergio Edmundo Beltran Abalos** | Universidad de Ingeniería y Tecnología (UTEC), Perú | **Líder** · arquitectura, modelo de asistencia y solver de horario |
+| 2 | Luis Angel De La Cruz Sánchez | Universidad Antonio Ruiz de Montoya, Perú | Análisis de datos · evaluación offline y segmentación |
+| 3 | Jean Sanchez Cardenas | Universidad Nacional de Ingeniería, Perú | Data engineering · Data Pack y modelo de necesidad |
+| 4 | Vladimir Jaward Hanco Soncco | Universidad Nacional de San Agustín de Arequipa, Perú | Producto e interfaz · experiencia de Pulse y Ruta |
+| 5 | Ana Mahns Condeza | Pontificia Universidad Católica de Chile, Chile | IA responsable y privacidad · ficha, guardrails y VIEW agregada |
+
+> **Multidisciplinaria por necesidad, no por casualidad.** El enunciado advierte que no todos
+> deben leer los archivos JSON: cada integrante tocó una capa. El equipo cubre las tres
+> instituciones y los dos países del desafío.
 
 ## 2. Misión abordada
 
