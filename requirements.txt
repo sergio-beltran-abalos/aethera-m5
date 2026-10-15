@@ -1,0 +1,7 @@
+gradio>=5.0
+google-genai
+openai
+huggingface_hub
+scikit-learn
+pandas
+numpy

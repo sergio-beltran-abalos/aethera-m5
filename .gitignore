@@ -1,0 +1,20 @@
+# Entorno
+.venv/
+__pycache__/
+*.py[cod]
+.env
+
+# Exportaciones de Pulse generadas en pruebas
+mi_registro_pulse_*.json
+
+# Artefactos de conversion
+*.tmp.html
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# El Data Pack NO se redistribuye (las bases lo prohíben).
+# Se versiona solo el marcador de posición.
+data/*
+!data/LEEME.txt
