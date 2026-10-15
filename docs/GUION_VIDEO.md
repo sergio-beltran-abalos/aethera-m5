@@ -1,185 +1,148 @@
-# Guion del video · Entregable 2 (3–5 min)
+# Especificación del video demostrativo · Entregable 2
 
-**Objetivo:** evidenciar que el prototipo funciona sobre los datos, y encuadrarlo para que
-el jurado sepa qué problema resuelve y por qué ese.
+Este documento define el contenido, la estructura y los objetivos evaluativos del video
+demostrativo del Entregable 2. El material resultante constituye respaldo documental de la
+entrega y sirve como guía de producción.
 
-> **¿Tiene que incluir el Entregable 1?** Sí, pero **comprimido a 40 segundos**. El enunciado
-> pide "mostrar funcionando", así que el grueso es demo en vivo. Pero el jurado califica
-> *Comprensión del problema* (15 %) sin haber visto el diagnóstico, y una demo sin encuadre
-> no impresiona a nadie. El E1 entra como **la evidencia que justifica la solución**, no como
-> una clase de metodología: no recontamos el embudo completo, contamos **la cifra que duele**
-> (68 %) y **a quién le duele** (826 personas).
+- **Duración objetivo:** 4 minutos
+- **Rango admitido por el enunciado:** 3 a 5 minutos
+- **Modalidad:** grabación de pantalla con narración
+- **Requisitos técnicos verificados:** aplicación en ejecución, proveedor de IA configurado,
+  tema claro activo
 
 ---
 
-## Estructura
+## 1. Objetivos evaluativos
 
-| Bloque | Tiempo | Qué |
+El video debe permitir al jurado verificar cinco afirmaciones. Cada una se corresponde con
+un bloque de la estructura.
+
+| # | Afirmación que debe verificarse | Bloque |
 |---|---|---|
-| 1 · El problema | 0:00 – 0:40 | La cifra, por qué NO es culpa del estudiante |
-| 2 · La población | 0:40 – 1:05 | Cómo se llegó a los 826 y qué tienen en común |
-| 3 · La solución | 1:05 – 2:35 | Demo en vivo: Pulse → Ruta → reservar → replanificar |
-| 4 · Qué se mueve | 2:35 – 3:10 | Impacto sobre el 68 %, con supuestos |
-| 5 · Los límites | 3:10 – 3:45 | IA responsable, incluido el límite del modelo |
-| 6 · Cierre | 3:45 – 4:00 | Reencuadre final |
+| 1 | El problema está delimitado con evidencia cuantitativa del Data Pack | 1 y 2 |
+| 2 | La población objetivo está identificada y es alcanzable | 2 |
+| 3 | El prototipo opera sobre datos reales del Data Pack | 3 |
+| 4 | La solución restringe el conjunto de candidatos según restricciones verificadas | 3 |
+| 5 | El sistema opera dentro de límites declarados y escala a otra institución | 5 |
 
-**Duración objetivo: 4:00.** Margen: 3:00 (corta bloques 4 y 5) — 5:00 (alarga la demo).
+## 2. Estructura
 
----
+| Bloque | Duración | Contenido | Evidencia en pantalla |
+|---|---|---|---|
+| 1 · Diagnóstico | 0:00 – 0:40 | Indicador de la misión y su causa más probable | 68,2 % · 62 % fuera de horario · 50 % nocturno |
+| 2 · Población | 0:40 – 1:05 | Segmento prioritario y caso representativo | 826 estudiantes · agenda del perfil |
+| 3 · Funcionamiento | 1:05 – 2:35 | Ejecución del prototipo de punta a punta | Consentimiento, registro de ánimo, propuesta, reserva |
+| 4 · Resultados | 2:35 – 3:10 | Evaluación offline y proyección sobre el indicador | 370 turnos · mediana 0 viables · 68,2 % → 65,0 % |
+| 5 · Alcance y límites | 3:10 – 3:45 | Supervisión humana y límites del modelo | Protocolo de crisis · AUC declarada |
+| 6 · Cierre | 3:45 – 4:00 | Encuadre del alcance del producto | — |
 
-## 1 · El problema — 0:00 a 0:40
+## 3. Desarrollo de cada bloque
 
-**Pantalla:** la app en la pestaña Pulse, sin tocar nada.
+### Bloque 1 · Diagnóstico (0:00 – 0:40)
 
-> "En Aethera, el 68 % de los estudiantes con sintomatología ansiosa moderada-alta nunca ha
-> consultado un servicio de apoyo. 1 868 personas.
->
-> Lo fácil sería decir que no saben que esos servicios existen. Pero al analizar las 2 500
-> conversaciones de la línea de orientación encontramos otra cosa: **el 62 % escribe fuera
-> del horario de atención, y la mitad llega de noche.**
->
-> No es que no busquen ayuda. Es que llegan cuando ya no hay nadie."
+**Contenido.** Presentación del indicador de la misión M5: 68,2 % de los estudiantes con
+sintomatología ansiosa moderada-alta no ha consultado un servicio de apoyo, equivalente a
+1 868 personas en UNI_NOVA_AETHER. Se introduce el hallazgo de la segunda oleada de datos
+(D4 y D5): el 62 % de las conversaciones de la línea de orientación se inician fuera del
+horario de atención y el 50 % entre las 18:00 y las 06:00.
 
-**En pantalla:** `68 %` · `62 % fuera de horario` · `50 % de noche`
+**Justificación narrativa.** Este bloque establece que el problema no es la desconocencia de
+la existencia de los servicios, sino la incompatibilidad entre la disponibilidad del
+estudiante y la del servicio. Esa distinción sustenta la totalidad del diseño.
 
----
+**Verificación.** Las cifras provienen de `aethera.evaluacion` y son reproducibles.
 
-## 2 · La población — 0:40 a 1:05
+### Bloque 2 · Población (0:40 – 1:05)
 
-**Pantalla:** selector de perfil; mostrar el perfil B ya seleccionado.
+**Contenido.** Descripción del segmento prioritario: 826 estudiantes que presentan dos o
+más fricciones simultáneas. Se presenta un caso representativo tomado del dataset, con su
+régimen de estudios, su jornada laboral y sus ventanas libres.
 
-> "Del cruce de la encuesta de bienestar con el historial académico nos quedó un grupo
-> concreto: **826 estudiantes**. Son quienes tienen al menos dos fricciones a la vez.
->
-> El caso que usamos hoy sale del dataset: estudia de noche, trabaja a tiempo completo y no
-> tiene red de apoyo en la ciudad.
->
-> Fíjense en su agenda: **de 8:00 a 16:24 trabajando, de 18:30 a 22:20 en clases.** Le quedan
-> dos horas al día. Ese es el margen real con el que hay que cumplir."
+**Verificación en pantalla.** La ficha del perfil muestra la bloquear ocupada —clases y
+trabajo— y las ventanas libres restantes, lo que hace visible la restricción que la
+solución debe resolver.
 
-**Por qué esta parte importa:** el jurado tiene que entender que la población no es "jóvenes
-con ansiedad", sino **gente con una agenda imposible**. De ahí sale todo el producto.
+### Bloque 3 · Funcionamiento (1:05 – 2:35)
 
-**En pantalla:** `826` · `2 fricciones o más` · la agenda del estudiante
+**Contenido.** Ejecución del prototipo en tres pasos consecutivos.
 
----
+| Paso | Acción | Evidencia |
+|---|---|---|
+| 3.1 | Activación del consentimiento y registro del estado de ánimo | La interfaz rechaza el registro sin consentimiento previo |
+| 3.2 | Descripción de una necesidad en lenguaje cotidiano | Tres citas propuestas con fecha, hora, servicio y canal |
+| 3.3 | Selección y confirmación de una cita | Código de reserva y recordatorios programados |
 
-## 3 · La solución — 1:05 a 2:35
+**Verificación en pantalla.** El panel «Cómo decidió Ruta» permanece visible durante todo el
+bloque, mostrando la acción decidida, el motivo clasificado, las herramientas invocadas y
+la procedencia de cada dato.
 
-### 3.1 Pulse (1:05 – 1:30)
+**Observación relevante para el jurado.** Las tres citas propuestas se ubican invariablemente
+en la franja libre del estudiante. Esta restricción es verificable a simple vista y constituye
+la contribución técnica central del proyecto.
 
-1. **Activar el consentimiento.** Señalar el checkbox.
-   > "Esto primero: sin consentimiento no se guarda nada."
-2. **Elegir ánimo** "Muy pesado" y un tema.
-3. **Registrar mi día.**
-   > "Veinte segundos. No es un test, no tiene respuestas correctas y no calcula puntajes.
-   > Si el estudiante lo autoriza, queda un registro que solo ve él."
-4. Presionar **💬 Hablar con Ruta** → salta a la pestaña Ruta.
+### Bloque 4 · Resultados (2:35 – 3:10)
 
-### 3.2 Ruta (1:30 – 2:15)
+**Contenido.** Resultados de la evaluación offline sobre 300 estudiantes reales del segmento
+prioritario: un directorio estático ofrece 370 turnos por estudiante, de los cuales el 28,2 %
+resulta compatible con su horario, con una mediana de cero turnos viables. Se presenta
+asimismo la proyección sobre el indicador de la misión bajo supuestos declarados.
 
-**Escribir:** `Trabajo todo el día, estudio de noche y no conozco a nadie en la U`
+**Precisión requerida.** La proyección debe presentarse como *estimación condicionada*, nunca
+como resultado observado. Los cinco supuestos deben enunciarse.
 
-> "Ruta no diagnostica. Escucha, clasifica lo que cuenta en un motivo no clínico y propone
-> citas concretas."
+### Bloque 5 · Alcance y límites (3:10 – 3:45)
 
-**Señalar las 3 opciones:**
+**Contenido.** Dos demostraciones.
 
-> "Mírenlas: son las 17:00. Ni una sola cae dentro de su horario de trabajo ni dentro de sus
-> clases. Eso no es casualidad: es un solver que cruza la apertura de cada servicio con la
-> agenda del estudiante."
+1. **Supervisión humana.** Una entrada que activa el protocolo de riesgo; el sistema deja de
+   orientar, entrega las líneas de ayuda verificadas y ofrece la derivación a una persona.
+2. **Transparencia sobre el modelo.** El modelo de asistencia rinde por debajo del azar en la
+   franja de esperas que el prototipo ofrece. El sistema expone esta condición mediante un
+   indicador de confianza, y la vista de Bienestar declara la métrica.
 
-### 3.3 Reservar (2:15 – 2:35)
+**Justificación.** Declarar el límite propio es la evidencia más directa de criterio en IA
+responsable, y el enunciado evalúa expresamente este criterio.
 
-**Escribir:** `2`
+### Bloque 6 · Cierre (3:45 – 4:00)
 
-> "Reserva, y pone recordatorios el día anterior y dos horas antes."
+**Contenido.** Encuadre del alcance: el sistema no diagnostica, no prescribe y no sustituye la
+atención profesional. Su función consiste en convertir una necesidad expresada en lenguaje
+cotidiano en una cita que el estudiante puede realmente cumplir dentro de su agenda real.
 
-*(Opcional, si sobra tiempo: escribir `no puedo ese día` para mostrar la replanificación.)*
+## 4. Condiciones previas a la grabación
 
----
-
-## 4 · Qué se mueve — 2:35 a 3:10
-
-**Pantalla:** pestaña Bienestar.
-
-> "En la prueba offline con 300 estudiantes reales del segmento: un directorio tradicional
-> les muestra **370 turnos**, de los cuales solo el **28 %** les sirve. La mediana es
-> **cero turnos viables**. Ruta les entrega el primero que sí, ya filtrado."
-
-**Luego, la proyección:**
-
-> "Sobre el indicador de la misión: con supuestos declarados uno por uno, el 68 % baja a
-> **65 %**, y en todo el rango de supuestos plausibles se mueve entre **0,6 y 7,5 puntos**.
-> Es poco, y lo decimos poco: no prometemos cerrar la brecha."
-
----
-
-## 5 · Los límites — 3:10 a 3:45
-
-**Pantalla:** volver a Ruta. Escribir: `Ya no quiero vivir`
-
-> "Ante una señal de riesgo Ruta deja de orientar. Da líneas reales — la 113 en Perú, el
-> 4141 en Chile — y ofrece que una persona lo contacte."
-
-**Luego, sobre el modelo — esto es lo que nos distingue:**
-
-> "Y una cosa más: nuestro modelo de asistencia rinde bien donde hay datos, y **muy mal en
-> la franja que la demo ofrece**. Lo medimos: 0,44 de AUC, es decir por debajo del azar. No
-> lo escondemos. La app marca confianza baja ahí y lo declara en pantalla."
-
----
-
-## 6 · Cierre — 3:45 a 4:00
-
-> "Aethera no diagnostica, no receta y no es terapia.
->
-> Lo que hace es algo mucho más pequeño y más útil: **convierte «necesito ayuda» en una cita
-> que el estudiante realmente puede cumplir.**"
-
----
-
-## Checklist antes de grabar
-
-- [ ] La IA real respondiendo: el panel debe decir `decidida por modelo`, **nunca** `reglas de respaldo`
-- [ ] Dejar respirar la pantalla ~8 segundos por respuesta: se ve lento, pero funciona
-- [ ] Pestaña Bienestar abierta y con KPIs visibles antes de grabar ese bloque
-- [ ] `Ya no quiero vivir` escrito en el portapapeles
-- [ ] Tema claro (la app se fuerza sola por JS)
-- [ ] Audio limpio: el video se evalúa por claridad, no por producción
-- [ ] Verificar que la agenda muestra `17:00` para el perfil B (si cambias la fecha simulada, cambian las horas)
-
-## Variante corta (3:00) — si se pasa de tiempo
-
-| Bloque | Acción |
+| Condición | Verificación |
 |---|---|
-| 1 · El problema | **No cortar.** Es el bloque que más puntúa |
-| 2 · La población | Comprimir a 15 s: "826 estudiantes, y este es uno de ellos" |
-| 3 · La solución | Cortar la replanificación |
-| 4 · Qué se mueve | Solo la cifra de los 370 turnos; mover la proyección al cierre |
-| 5 · Los límites | **No cortar.** La honestidad sobre el modelo es el diferenciador |
-| 6 · Cierre | Mantener literal |
+| Proveedor de IA operativo | El panel de trazabilidad indica `decidida por modelo` |
+| Data Pack completo | `python app.py --diagnostico` sin observaciones |
+| Tema claro activo | La aplicación lo fuerza automáticamente |
+| Perfil correcto seleccionado | El perfil B, de horario nocturno y jornada completa |
+| Caption del video | *Aethera es una ciudad universitaria ficticia; todos los datos son sintéticos* |
 
-## Preguntas que más cuesta — respuestas cortas
+## 5. Adaptaciones por duración
 
-**«¿Por qué no usan un modelo más grande?»**
-Equidad: el enunciado exige nivel gratuito. Y el problema no es de inteligencia, es de
-restricciones horarias: un modelo más grande no resuelve un choque de agenda.
+**Si se dispone de menos de 3:30.** El bloque 1 conserva su duración completa, por ser el de
+mayor ponderación en la evaluación. Se reduce el bloque 2 a una mención del segmento y una
+del perfil, y se omite la replanificación dentro del bloque 3.
 
-**«¿Cómo saben que esto funciona y no solo que funciona en la demo?»**
-No lo sabemos todavía, y por eso el E2 proyecta con supuestos declarados en vez de afirmar
-un resultado. El indicador que falta es el *Match Rate en campo*: la fracción de reservas
-reales a las que el estudiante asiste. Eso exige el piloto.
+**Si se dispone de más de 4:30.** El bloque 3 se amplía con una segunda ronda de
+replanificación y con la demostración de portabilidad a otra institución mediante la variable
+`AETHERA_INSTITUCION`.
 
-**«¿Y si se detecta una crisis?»**
-Dos capas. La primera es por patrón, determinista y auditable. La segunda es el propio modelo
-marcando riesgo indirecto. En ambos casos: líneas reales y contacto humano con prioridad alta.
+**Nunca deben suprimirse** el bloque 1 (comprensión del problema) ni el apartado 5 del
+bloque 5 (límites del modelo), por ser los de mayor valor en la rúbrica de evaluación.
 
-**«¿Por qué 10 personas y no menos en el tablero?»**
-k-anonimato. Con menos de 10, en una universidad de ese tamaño, se podría reidentificar a
-alguien cruzando dos tablas. Es el mismo criterio que aplica la Ley 29733 a los datos sensibles.
+## 6. Verificación posterior a la grabación
 
-**«El 68 % es un invento del dataset sintético, ¿no?»**
-Los datos son sintéticos, sí. Pero el **razonamiento** se sostiene con cualquier dataset: si
-la derivación actual acierta 34 % cuando el azar es 33 %, el sistema de referencia no está
-transmitiendo el motivo. Ese hallazgo es el que justifica cambiarlo.
+| Punto | Comprobación |
+|---|---|
+| Duración | Dentro del rango de 3 a 5 minutos |
+| Audio | Comprensible sin subtítulos |
+| Legibilidad | Los números citados en pantalla coinciden con lo narrado |
+| Caption | Presente y visible |
+| Ausencia de datos reales | Ninguna pantalla muestra datos de personas identificables |
+
+---
+
+*Este documento no sustituye al video: lo especifica. El enlace al material grabado se
+consigna en la sección 12 del `README.md`.*

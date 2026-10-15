@@ -191,43 +191,48 @@ tests/           Pruebas de humo
 data/            Data Pack (no redistribuir)
 ```
 
-## 10. Cómo correrlo
+## 10. Documentación
+
+| Documento | Contenido |
+|---|---|
+| **[`docs/INSTALACION.md`](docs/INSTALACION.md)** | Requisitos, puesta en marcha, proveedores, operación sin clave y publicación |
+| **[`docs/DOCUMENTO_E2.md`](docs/DOCUMENTO_E2.md)** | Entregable 2: solución, uso de IA y resultados frente al indicador |
+| **[`docs/FICHA_IA_RESPONSABLE.md`](docs/FICHA_IA_RESPONSABLE.md)** | Ficha de IA responsable (una página) |
+| [`docs/IMPACTO.md`](docs/IMPACTO.md) | Proyección sobre el indicador de la misión, con supuestos y sensibilidad |
+| [`docs/COSTOS.md`](docs/COSTOS.md) | Viabilidad técnica y económica |
+| [`docs/GUION_VIDEO.md`](docs/GUION_VIDEO.md) | Especificación del video demostrativo |
+
+## 11. Puesta en marcha
 
 ```bash
 pip install -r requirements.txt
-
-# Windows (CMD)
-set GEMINI_API_KEY=tu_clave
-# macOS / Linux:  export GEMINI_API_KEY=tu_clave
-# Ojo: en PowerShell es  $env:GEMINI_API_KEY="tu_clave"
-
-python app.py                    # abre http://127.0.0.1:7860
-python app.py --diagnostico      # comprueba Data Pack, proveedor y clave
-python -m aethera.evaluacion      # reproduce las cifras del §6
+python app.py                  # interfaz en http://127.0.0.1:7860
+python app.py --diagnostico    # verifica Data Pack, proveedor y clave
 ```
 
-**Sin clave de API** (o con `set AETHERA_PROVEEDOR=offline`) funciona igual, usando el
-clasificador de D5 y las plantillas de respaldo.
+Procedimiento completo, proveedores alternativos y opciones de publicación en
+[`docs/INSTALACION.md`](docs/INSTALACION.md).
 
-| Variable | Por defecto | Para qué |
+**La clave de API es opcional.** En su ausencia el sistema opera con un clasificador
+entrenado sobre D5 (80,8 % de exactitud en validación cruzada) y con plantillas de respaldo.
+El escenario se verifica de forma automatizada mediante `tests/escenario_tercero.py`.
+
+| Variable | Predeterminado | Función |
 |---|---|---|
 | `AETHERA_PROVEEDOR` | `gemini` | `gemini` · `openai` · `huggingface` · `compatible` · `offline` |
-| `AETHERA_MODELO` | según proveedor | Sobrescribe el id del modelo |
-| `AETHERA_DATA` | `./data` | Ruta alterna del Data Pack |
-| `AETHERA_INSTITUCION` | `UNI_NOVA_AETHER` | Otra institución (escalabilidad) |
-| `AETHERA_LANZAR_UI` | `1` | `0` para no abrir el navegador |
-
-## 11. Publicar en Hugging Face Spaces
-
-1. **New Space** → SDK **Gradio** → visibilidad **Private** (el Data Pack no se redistribuye).
-2. Sube `app.py`, `requirements.txt` y este `README.md`.
-3. Crea `data/` y sube los **7** archivos del Data Pack.
-4. **Settings → Variables and secrets** → agrega `GEMINI_API_KEY`.
-5. El Space se construye solo en una dirección fija, lista para grabar el video.
+| `AETHERA_MODELO` | según proveedor | Identificador del modelo |
+| `AETHERA_DATA` | `./data` | Ubicación del Data Pack |
+| `AETHERA_INSTITUCION` | `UNI_NOVA_AETHER` | Institución a atender |
+| `AETHERA_LANZAR_UI` | `1` | `0` desactiva el arranque de la interfaz |
+| `AETHERA_SHARE` | `0` | `1` genera una dirección pública temporal |
 
 ## 12. Video demostrativo
 
-<!-- ENLACE AL VIDEO -->
+| | |
+|---|---|
+| **Enlace** | Se consigna una vez disponible |
+| **Duración objetivo** | 4 minutos (rango permitido: 3–5) |
+| **Especificación** | [`docs/GUION_VIDEO.md`](docs/GUION_VIDEO.md) |
 
 ---
 
