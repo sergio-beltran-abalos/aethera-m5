@@ -164,7 +164,14 @@ Consentimiento expreso · datos sensibles bajo Ley 29733 (DS 016-2024-JUS) · AR
 (exportar y borrar desde la interfaz) · vista de Bienestar con supresión de celdas `< 10` ·
 transferencia internacional declarada · **`anxiety_band` nunca se usa en tiempo de ejecución**.
 
-→ Documento completo: [`docs/FICHA_IA_RESPONSABLE.md`](docs/FICHA_IA_RESPONSABLE.md)
+Entregables en la raíz del repositorio:
+
+| Archivo | Contenido |
+|---|---|
+| **`FICHA_IA_RESPONSABLE.pdf`** | Ficha de IA responsable, una página |
+| `DOCUMENTO_E2.pdf` | Entregable 2: solución, uso de IA y resultados |
+
+Documento fuente de la ficha: [`docs/FICHA_IA_RESPONSABLE.md`](docs/FICHA_IA_RESPONSABLE.md)
 
 ## 9. Estructura
 
@@ -203,6 +210,19 @@ data/            Data Pack (no redistribuir)
 | [`docs/GUION_VIDEO.md`](docs/GUION_VIDEO.md) | Especificación del video demostrativo |
 
 ## 11. Puesta en marcha
+
+**Instalación automática.** El repositorio incluye un instalador que verifica el entorno,
+crea el entorno virtual, instala las dependencias y comprueba la configuración:
+
+| Sistema | Archivo | Ejecución |
+|---|---|---|
+| Windows | `instalar.bat` | Doble clic |
+| macOS / Linux | `instalar.sh` | `chmod +x instalar.sh && ./instalar.sh` |
+
+Ambos verifican la presencia del Data Pack e indican exactamente qué archivo falta cuando la
+carpeta `data/` está incompleta.
+
+**Instalación manual:**
 
 ```bash
 pip install -r requirements.txt
