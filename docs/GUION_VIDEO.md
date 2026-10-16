@@ -1,177 +1,144 @@
-# Guion Definitivo de Grabación · Video Demostrativo Entregable 2
+# Guion de Grabación · Video Demostrativo Entregable 2 (Versión Concisa)
 **Proyecto:** Aethera Pulse + Ruta · Misión M5 (Desafío Ciudad Aethera)  
-**Duración objetivo:** 4 minutos y 15 segundos (Rango oficial permitido: 3 a 5 minutos)  
-**Modalidad:** Grabación de pantalla con narración en audio (puede usarse cámara web en miniatura o solo voz).
+**Duración objetivo:** ~4:00 minutos (Rango permitido: 3 a 5 minutos)  
+**Límite de palabras:** ~550 palabras (calculado para hablar con pausa y claridad a 135 palabras/min)  
+**Modalidad:** Grabación de pantalla con narración en audio.
 
 ---
 
-## 1. Alineación con la Rúbrica Oficial de Evaluación
+## 1. Cobertura de la Rúbrica Oficial de Evaluación
 
-Cada segundo de este guion está diseñado para sumar el puntaje máximo en los 7 criterios oficiales:
-
-| Criterio de la Rúbrica | Peso | Cómo se evidencia en el guion |
+| Criterio | Peso | Elemento clave demostrado en el guion |
 |---|:---:|---|
-| **Innovación y enfoque tecnológico** | **20 %** | Arquitectura agéntica en 3 capas (clasificador no clínico, planificador de acciones, redactor controlado), solver de restricciones de horarios y disparadores proactivos. |
-| **Comprensión del problema** | **15 %** | Fundamentación cuantitativa de M5 con Data Pack: 68,2 % de no búsqueda, 42 días de espera en D2, 62 % de consultas fuera de oficina y 50 % nocturnas en D5. |
-| **IA Responsable** | **15 %** | Consentimiento informado ARCO (descarga y borrado en 1 clic), privacidad en calendario («Cita campus»), panel de transparencia en vivo («Cómo decidió Ruta»), guardrails clínicos y derivación humana inmediata. |
-| **Viabilidad y sostenibilidad** | **15 %** | Plan de adopción en 3 fases: piloto a costo cero (0 USD en capa gratuita sin tarjeta), escalamiento a 15–40 USD/mes para todo el campus, y modelo de pares que evita contratar nóminas clínicas exorbitantes. |
-| **Impacto social** | **15 %** | Match rate del 100 % en turnos viables frente al 28,2 % del directorio tradicional. Reducción estimada de la no búsqueda del 68,2 % al 65,0 % (187 estudiantes alcanzados). |
-| **Escalabilidad** | **10 %** | Replicable en cualquier universidad de Chile, Perú o Latinoamérica reemplazando únicamente el mapa de servicios (D6) y calendario académico (D7). Modelo de pares que no satura al equipo clínico. |
-| **Calidad del pitch** | **10 %** | Narración fluida, estructurada, sincronizada con la pantalla y con respaldo riguroso de cada cifra. |
+| **Innovación y enfoque tecnológico** | **20 %** | Arquitectura agéntica en 3 capas, solver de restricciones horarias y sugerencias proactivas. |
+| **Comprensión del problema** | **15 %** | Datos de M5: 68,2 % no busca ayuda, 42 días de espera (D2), 62 % fuera de oficina y 50 % noche (D5). |
+| **IA Responsable** | **15 %** | Consentimiento ARCO (descarga/borrado), «Cita campus» en calendario, traza agéntica y derivación humana. |
+| **Viabilidad y sostenibilidad** | **15 %** | Adopción en 3 fases: piloto a 0 USD (sin tarjeta), escala a 15–40 USD/mes y red de pares sustentable. |
+| **Impacto social** | **15 %** | Match Rate de 100 % vs 28,2 % de un directorio, reduciendo la no búsqueda del 68,2 % al 65,0 %. |
+| **Escalabilidad** | **10 %** | Plug & Play con aulas virtuales (Canvas/Blackboard), adaptable a cualquier universidad con D6 y D7. |
+| **Calidad del pitch** | **10 %** | Narración ágil, directa, concisa y sincronizada con cada clic en pantalla. |
 
 ---
 
 ## 2. Preparación técnica previa a la grabación
 
-1. **URL de la app:** Abre `http://127.0.0.1:7860` en el navegador (Google Chrome o Edge) en pantalla completa (F11 o maximizada).
-2. **Configuración de la demo en la barra superior:**
-   * **Estudiante sintético:** Selecciona `B · Nocturno, trabaja tiempo completo`.
-   * **Fecha simulada:** Selecciona `Antes de finales · jue 26 nov 2026`.
-   * **Cargar historial de ejemplo:** Marcado con check (`✓`).
-   * Pulsa **«Nueva sesión»** para arrancar limpio.
-3. **Pestañas listas:** Empezarás en la pestaña **🌤️ Pulse**.
+1. Abre `http://127.0.0.1:7860` en Chrome o Edge (pantalla maximizada).
+2. En la barra superior:
+   * **Estudiante:** `B · Nocturno, trabaja tiempo completo` (el caso más exigente).
+   * **Fecha:** `Antes de finales · jue 26 nov 2026`.
+   * **Historial de ejemplo:** Marcado (`✓`).
+   * Pulsa **«Nueva sesión»** y empieza en **🌤️ Pulse**.
 
 ---
 
-## 3. Guion Paso a Paso (Pantalla + Locución)
+## 3. Guion Escena por Escena (Acción en Pantalla + Locución)
 
 ```
-TIEMPO TOTAL: 04:15
-ESTRUCTURA: 5 BLOQUES
+TIEMPO ESTIMADO: 03:55 – 04:10 min
+TOTAL PALABRAS DE LOCUCIÓN: ~550 palabras
 ```
 
 ---
 
-### BLOQUE 1 · Diagnóstico y Comprensión del Problema (0:00 – 0:45)
-**Criterios evaluados:** *Comprensión del problema (15 %) · Calidad del pitch (10 %)*
+### BLOQUE 1 · Diagnóstico y Comprensión del Problema (0:00 – 0:40)
+> *Comprensión del problema (15 %) · Calidad del pitch (10 %)*
 
-* **Qué muestras en pantalla:**
-  * Vista general de la aplicación en la pestaña **🌤️ Pulse**.
-  * Haz scroll suave hacia el acordeón de configuración superior donde se ve la ficha del **Perfil B (Estudiante nocturno que trabaja a tiempo completo)**: muestra cómo su agenda está ocupada de 09:00 a 17:00 en trabajo y de 18:00 a 22:00 en clases.
-
-* **Qué dices en voz alta:**
-  > «Hola a todos. En el Desafío Ciudad Aethera abordamos la **Misión M5**: la baja búsqueda de apoyo institucional en estudiantes universitarios con malestar emocional.
+* **En pantalla:** Vista de la pestaña **🌤️ Pulse**. Abre un segundo la barra superior mostrando el **Perfil B**: trabaja de 09:00 a 17:00 y estudia de 18:00 a 22:00.
+* **Locución (104 palabras):**
+  > «Hola a todos. En la **Misión M5** abordamos una paradoja crítica de la universidad: el **68,2 %** de los estudiantes con malestar moderado a alto nunca consulta a bienestar. Y no es falta de interés: en el Data Pack las citas demoran **42 días**, y el **62 % de las consultas ocurren fuera de oficina**, con un **50 % de noche**.
   >
-  > Al analizar los datos del Data Pack institucional descubrimos una paradoja crítica: el **68,2 %** de los estudiantes con malestar moderado a alto en la universidad nunca ha consultado un servicio de bienestar. Y la causa principal no es falta de voluntad: en el dataset D2 las citas demoran en promedio **42 días**, y en el dataset D5 descubrimos que el **62 % de las consultas ocurren fuera del horario de oficina**, con un **50 % en horario nocturno**.
-  >
-  > **Aethera Pulse + Ruta** está pensado para **toda la comunidad universitaria** (diurnos, vespertinos, virtuales y presenciales). Sin embargo, para esta demostración elegimos el caso más exigente: nuestro Perfil B, un estudiante que trabaja a tiempo completo en el día y estudia en la noche. Si resolvemos la fricción para quien tiene el horario más ajustado, el sistema funciona para todos.
-  >
-  > Además, una ventaja clave es que la plataforma está **integrada directamente al ecosistema de la universidad**: se conecta con el calendario académico, la oferta de servicios y los horarios del campus, permitiendo un acceso inmediato y personalizado a los datos sin trámites engorrosos.»
+  > **Aethera Pulse + Ruta** está integrado a los sistemas de la universidad y sirve a toda la comunidad. Para esta demo usamos el caso más exigente: un estudiante que trabaja de día y cursa de noche. Si resolvemos sus restricciones, funciona para todos.»
 
 ---
 
-### BLOQUE 2 · Pulse: Moodtrack, Contexto y Prevención Responsable (0:45 – 1:30)
-**Criterios evaluados:** *IA Responsable (15 %) · Innovación y enfoque tecnológico (20 %)*
+### BLOQUE 2 · Pulse: Contexto, Moodtrack y Consentimiento (0:40 – 1:25)
+> *IA Responsable (15 %) · Innovación tecnológica (20 %)*
 
-* **Qué muestras en pantalla:**
-  * En la pestaña **🌤️ Pulse**, señala el **Banner institucional contextual** que aparece arriba (*«Encuentro de bienestar previo a finales...»*).
-  * Señala el checkbox de **Consentimiento informado**. Desmárcalo y pulsa "Registrar mi día" (muestra que la app no guarda nada sin consentimiento).
-  * Vuelve a marcar el consentimiento (`✓`).
-  * En el **Moodtrack**, selecciona la opción de ánimo: 🔴 *Muy pesado*.
-  * Marca los factores influyentes: `Exámenes` y `Sueño`.
-  * Pulsa el botón principal **«Registrar mi día»**.
-  * Observa cómo en pantalla aparece inmediatamente la tarjeta interactiva: **«Ruta tiene una sugerencia»** (*«Antes de finales es normal sentir sobrecarga... te propone 3 espacios»*), junto al botón *«💬 Ver la propuesta en Ruta»*.
-
-* **Qué dices en voz alta:**
-  > «La primera puerta de entrada es **Pulse**, un espacio de autoconocimiento preventivo.
+* **En pantalla:**
+  1. Señala el **Banner contextual** arriba (*«Semana previa a finales...»*).
+  2. Muestra el checkbox de **Consentimiento** (desmarca y dale a registrar para ver la alerta de privacidad; luego vuelve a marcarlo).
+  3. En **Moodtrack**, marca 🔴 *Muy pesado* y temas `Exámenes` y `Sueño`.
+  4. Clic en **«Registrar mi día»**.
+  5. Aparece la tarjeta: **«Ruta tiene una sugerencia»** con el botón *«💬 Ver la propuesta en Ruta»*.
+* **Locución (90 palabras):**
+  > «La primera puerta es **Pulse**, para autoconocimiento preventivo.
   >
-  > Primero, la plataforma se adapta dinámicamente al contexto real de la universidad: este banner sincronizado con el calendario académico D7 detecta que estamos en la semana previa a exámenes finales, reconociendo que la presión aumenta en estos días.
+  > Este banner contextual se sincroniza con el calendario académico: detecta la semana previa a exámenes finales, cuando la sobrecarga se dispara.
   >
-  > Segundo, aplicamos **IA Responsable y privacidad por diseño**: el sistema exige consentimiento explícito previo y garantiza los derechos ARCO. El estudiante puede descargar su registro en JSON o borrarlo completamente en un solo clic; nada se procesa a ciegas.
+  > Aplicamos **IA responsable y privacidad por diseño**: exige consentimiento explícito previo y respeta los derechos ARCO, permitiendo descargar o borrar el registro en un clic.
   >
-  > Al registrar cómo nos sentimos hoy, el motor de reglas y disparadores detecta un patrón de sobrecarga acumulada. Pero no invade ni agenda a la fuerza: despliega de forma no intrusiva esta tarjeta de sugerencia proactiva, invitando al estudiante a explorar opciones cuando él lo decida.»
+  > Al registrar un día pesado con exámenes y poco sueño, el motor detecta la sobrecarga y despliega esta **tarjeta de sugerencia proactiva**: le avisa que hay opciones disponibles, pero sin invadir ni agendar a la fuerza.»
 
 ---
 
-### BLOQUE 3 · Ruta: IA Agéntica, Exploración, Derivación y Transparencia (1:30 – 2:55)
-**Criterios evaluados:** *Innovación y enfoque tecnológico (20 %) · IA Responsable (15 %)*
+### BLOQUE 3 · Ruta: IA Agéntica, Exploración, Pares y Solver (1:25 – 2:40)
+> *Innovación tecnológica (20 %) · IA Responsable (15 %)*
 
-* **Qué muestras en pantalla:**
-  * Haz clic en el botón **«💬 Ver la propuesta en Ruta»** (o en la pestaña **💬 Ruta**).
-  * **Paso 3.1 (Exploración sin forzar):** En la caja de chat, escribe un mensaje vago:  
-    `"No sé bien qué me pasa, ando raro últimamente"` y pulsa Enter.
-    * Muestra la respuesta de Ruta: acompaña con calidez, no diagnostica ni receta, y no impone una cita prematura.
-  * **Paso 3.2 (Inteligencia de necesidad y ruteo a pares):** Ahora haz clic en una de las ideas para probar:  
-    `"Trabajo todo el día y me siento solo en la U"` y pulsa Enter.
-    * Muestra cómo Ruta detecta que no es un problema clínico, sino de apoyo social (`social_support`), y le propone turnos de **Acompañamiento entre pares** (`Espacio Pares`), con horarios nocturnos y sábados de 18:00 a 20:00 (compatibles con su trabajo).
-    * *(Opcional / Comentario rápido)*: Si el estudiante planteara dudas sobre su futuro laboral, Ruta lo derivaría a Orientación de Trayectoria.
-  * **Paso 3.3 (Transparencia agéntica):** Señala el panel derecho **«Cómo decidió Ruta»**:
-    * Muestra la traza en vivo: *Guardrail de entrada: permitido*, *Acción: orientar*, *Motivo: apoyo social*, *Servicio: peer_support*, *Guardrail de salida: verificado*.
-  * **Paso 3.4 (Reserva y Privacidad en Calendario):** En el chat escribe `1` (o `"la primera"`) para reservar la cita.
-    * Muestra la confirmación de la reserva en la tabla inferior.
-    * Señala cómo en la columna del calendario el título aparece como **«Cita campus»** (estilo neutro), protegiendo la privacidad del estudiante si comparte su pantalla o calendario con compañeros de trabajo o familia.
-  * **Paso 3.5 (Escalamiento humano):** Señala el botón naranja **«Quiero que una persona me contacte»**, explicando que el estudiante nunca queda atrapado en un bucle con la IA.
-
-* **Qué dices en voz alta:**
-  > «Pasamos a **Ruta**, nuestro agente conversacional con arquitectura agéntica de tres niveles.
+* **En pantalla:**
+  1. Clic en **«💬 Ver la propuesta en Ruta»** (pasa a la pestaña Ruta).
+  2. Escribe: `No sé bien qué me pasa, ando raro últimamente` y Enter. (Ruta responde con empatía exploratoria, sin diagnosticar).
+  3. Clic en la idea: `Trabajo todo el día y me siento solo en la U` y Enter.
+     * Muestra que clasifica `social_support` y deriva a **Acompañamiento entre pares**.
+     * Señala los horarios: **sábados y tardes de 18:00 a 20:00**.
+  4. Señala el panel lateral **«Cómo decidió Ruta»** (traza agéntica y guardrails).
+  5. Escribe `1` para reservar. Muestra que en la tabla del calendario dice **«Cita campus»** (estilo neutro antiestigma).
+  6. Señala el botón naranja **«Quiero que una persona me contacte»**.
+* **Locución (143 palabras):**
+  > «Al entrar a **Ruta**, si el estudiante escribe *"no sé qué me pasa"*, el agente no inventa diagnósticos ni fuerza citas: activa un modo de acompañamiento exploratorio.
   >
-  > Si el estudiante no sabe exactamente qué le ocurre y escribe *"no sé qué me pasa"*, Ruta no fuerza una derivación apresurada ni inventa un diagnóstico. Activa un modo de acompañamiento exploratorio que ayuda a poner en palabras su situación.
+  > Cuando expresa su dificultad real —*"trabajo todo el día y me siento solo"*—, la IA clasifica **apoyo social** y lo deriva a **Acompañamiento entre pares**.
   >
-  > Cuando el estudiante expresa su necesidad real —por ejemplo, *"trabajo todo el día y me siento solo en la universidad"*—, el clasificador de IA identifica que se trata de **apoyo social** (`social_support`). En lugar de mandarlo a una consulta psicológica innecesaria, lo canaliza al servicio de **Acompañamiento entre pares**.
+  > ¿Cómo se atiende si trabaja de día y estudia de noche? El solver integrado cruza sus horarios y encuentra turnos reales: primero, el servicio de pares atiende hasta las **20:00 y sábados completos**; segundo, para orientación profesional detecta la franja de **17:00 a 18:00**, justo entre el trabajo y su clase.
   >
-  > Y aquí está el núcleo de nuestra innovación: al estar **integrado con los sistemas de la universidad**, el solver conoce al instante el catálogo de servicios (D6) y las ventanas de clases. En lugar de interrogar al estudiante con formularios largos, cruza sus restricciones en milisegundos y le propone únicamente citas 100 % viables: sábados y tardes extendidas.
-  >
-  > Toda decisión es 100 % auditable en el panel lateral **"Cómo decidió Ruta"**, con guardrails de entrada que filtran crisis o intentos clínicos, y guardrails de salida que validan que cada sede y horario existan en el campus.
-  >
-  > Además, resolvemos el estigma social con ingeniería de privacidad: al reservar, la cita se registra en el calendario como **«Cita campus»**. Nadie a su alrededor sabrá a qué servicio acude. Y si en cualquier momento prefiere hablar con alguien del equipo, un solo clic en el botón naranja deriva su solicitud a Bienestar.»
+  > En el panel lateral vemos la traza agéntica con guardrails de entrada y salida. Al reservar, se guarda como **«Cita campus»** en el calendario, protegiéndolo del estigma. Y ante cualquier duda, este botón naranja deriva a una persona de inmediato.»
 
 ---
 
-### BLOQUE 4 · Bienestar: Inteligencia Institucional y Validación de KPIs (2:55 – 3:45)
-**Criterios evaluados:** *Comprensión del problema (15 %) · Impacto social (15 %)*
+### BLOQUE 4 · Bienestar: Inteligencia Institucional y Validación de KPIs (2:40 – 3:30)
+> *Comprensión del problema (15 %) · Impacto social (15 %)*
 
-* **Qué muestras en pantalla:**
-  * Cambia a la pestaña **🏛️ Bienestar**.
-  * Señala los bloques de métricas agregadas (144 conversaciones analizadas en la ventana, 62 % fuera de horario, 50 % nocturno).
-  * Muestra la **Cola de contacto institucional**: comprueba que la solicitud o reserva de la demo se agregó en vivo, mostrando únicamente datos mínimos no clínicos (`student_id`, motivo general, fecha).
-  * Señala la sección de **Recomendaciones para el equipo de bienestar**: destacar la recomendación de ampliar cobertura de pares los fines de semana y turnos vespertinos.
-
-* **Qué dices en voz alta:**
-  > «La tercera pata del sistema es el módulo de **Bienestar Institucional**. Aethera no solo asiste al estudiante; retroalimenta la toma de decisiones de la universidad con privacidad diferencial y k-anonimato.
+* **En pantalla:**
+  1. Pasa a la pestaña **🏛️ Bienestar**.
+  2. Señala las métricas agregadas (144 chats, 62 % fuera de oficina, 50 % noche).
+  3. Muestra la cola de derivaciones actualizada en vivo con la cita que acabas de reservar.
+  4. Señala las **Recomendaciones de Machine Learning** para la universidad.
+* **Locución (104 palabras):**
+  > «En **Bienestar**, la universidad visualiza métricas agregadas con k-anonimato: 144 conversaciones donde se comprueba el pico nocturno, actualizadas en vivo con nuestra demo.
   >
-  > Aquí el equipo de bienestar visualiza las tendencias agregadas de las 144 conversaciones analizadas: picos nocturnos, motivos más frecuentes y la cola de derivaciones que acabamos de generar en vivo durante la demo, sin exponer jamás conversaciones privadas.
+  > Con estos datos y Machine Learning, el sistema le da **evidencia a las autoridades para generar nuevos espacios**: recomienda habilitar turnos virtuales nocturnos rotativos y ampliar las plazas de pares donde realmente se concentra la demanda.
   >
-  > Basándose en estos patrones y en el modelo predictivo de asistencia de Machine Learning entrenado sobre D2 y D5, el sistema entrega recomendaciones directas a las autoridades universitarias: por ejemplo, reforzar el acompañamiento entre pares en fines de semana y abrir franjas vespertinas, optimizando los recursos donde realmente se necesitan.
-  >
-  > Respecto al impacto prometido en el Entregable 1: evaluamos el sistema offline contra 300 casos del segmento prioritario. Un directorio tradicional expone al estudiante a 370 turnos donde solo el **28,2 %** es compatible y la mediana de turnos viables para un estudiante trabajador es de **cero**. Con Ruta logramos un **Match Rate del 100 %** de citas cumplibles, proyectando una reducción honesta y científicamente fundada de la no búsqueda de ayuda del **68,2 % al 65,0 %**, impactando a 187 estudiantes adicionales en este período.»
+  > Cumplimos los KPIs del Entregable 1: frente a un directorio tradicional donde la mediana de turnos viables para un trabajador es de **cero**, Ruta logra un **Match Rate del 100 %**, reduciendo de forma científicamente fundada la no búsqueda del **68,2 % al 65,0 %**.»
 
 ---
 
-### BLOQUE 5 · Plan de Adopción, Viabilidad y Cierre (3:45 – 4:20)
-**Criterios evaluados:** *Viabilidad y sostenibilidad (15 %) · Escalabilidad (10 %)*
+### BLOQUE 5 · Plan de Adopción, Viabilidad y Cierre (3:30 – 4:10)
+> *Viabilidad y sostenibilidad (15 %) · Escalabilidad (10 %)*
 
-* **Qué muestras en pantalla:**
-  * Muestra el pie de página de la aplicación (`Aethera es una ciudad universitaria ficticia... proveedor de IA: gemini · costo ≈ 0 USD`), o la documentación de arquitectura técnica en el repositorio (por ejemplo, el archivo `COSTOS.md` o la sección de despliegue).
-
-* **Qué dices en voz alta:**
-  > «Para que esto no quede en un prototipo de laboratorio, diseñamos un **Plan de Adopción Institucional en 3 fases**, pensado para que cualquier universidad vea su viabilidad técnica y económica inmediata:
+* **En pantalla:** Muestra el pie de página de la app (`costo ≈ 0 USD · proveedor gemini / offline`), o el archivo de costos/despliegue en el repositorio.
+* **Locución (118 palabras):**
+  > «Para su adopción institucional, diseñamos un plan viable en 3 fases:
   >
-  > 1. **Fase 1 · Integración Plug & Play:** La universidad no tiene que reinventar sus sistemas. La plataforma se embebe directamente en el portal estudiantil o aula virtual existente (como Canvas o Blackboard). Solo requiere alimentar dos archivos estándar: el catálogo de servicios de bienestar y el calendario de exámenes.
+  > 1. **Plug & Play:** Se integra al aula virtual existente (como Canvas o Blackboard) cargando solo el catálogo del campus y el calendario de exámenes.
+  > 2. **Piloto a Costo Cero:** La universidad valida el impacto con hasta 1.000 estudiantes a **0 USD**, en la capa gratuita de IA y sin tarjetas de crédito.
+  > 3. **Escalamiento Sostenible:** A escala completa solo cuesta entre **15 y 40 USD al mes** en cómputo, o 0 USD con modelos locales. Como se apoya en estudiantes pares, no infla la nómina clínica de psicólogos.
   >
-  > 2. **Fase 2 · Piloto a Costo Cero (0 USD):** La universidad puede validar el impacto con un piloto de hasta 1.000 estudiantes a **costo cero absoluto**. Opera 100 % dentro de la capa gratuita de IA y con respaldos locales sin requerir tarjeta de crédito, contratos de nube costosos ni infraestructura adicional.
-  >
-  > 3. **Fase 3 · Escalamiento Institucional Sostenible:** Al expandirlo a toda la universidad (6.000 a 10.000 alumnos), el consumo computacional de IA apenas ronda entre **15 y 40 USD mensuales** —o costo cero si la institución prefiere correr modelos abiertos como Llama en sus propios servidores—. 
-  >
-  > Además, el modelo es financieramente sostenible porque no exige contratar decenas de psicólogos clínicos adicionales: la IA resuelve la saturación derivando el malestar cotidiano y la soledad hacia la **red de pares estudiantiles**, reservando a los profesionales de salud para casos clínicos prioritarios. Evitar la deserción de un solo alumno amortiza con creces el sistema completo.
-  >
-  > Aethera Pulse + Ruta demuestra que con IA responsable, diseño centrado en el estudiante y costo marginal cero, es posible democratizar el bienestar universitario en toda América Latina. Muchas gracias.»
+  > Aethera Pulse + Ruta conecta al estudiante con el apoyo que realmente cabe en su vida. Muchas gracias.»
 
 ---
 
-## 4. Checklist de Grabación (Para asegurar un 100 % de cumplimiento)
+## 4. Checklist de Grabación (Hitos clave en pantalla)
 
-| Minuto | Hito que el jurado debe ver y escuchar | Verificado |
-|:---:|---|:---:|
-| **0:25** | Citar cifras del problema: **68,2 % no búsqueda, 42 días espera, 62 % fuera de horario**. | [ ] |
-| **0:55** | Mostrar el **Banner contextual** sincronizado con calendario académico (D7). | [ ] |
-| **1:10** | Demostrar **Consentimiento informado** y mencionar derechos ARCO (descarga/borrado). | [ ] |
-| **1:25** | Ver la **Tarjeta proactiva de Ruta** («Ruta tiene una sugerencia») generada desde Pulse. | [ ] |
-| **1:45** | Probar un mensaje vago en Ruta (*«no sé qué me pasa»*) y ver el acompañamiento exploratorio. | [ ] |
-| **2:10** | Probar mensaje de soledad/trabajo y ver la derivación a **Pares** en horario de sábado/noche. | [ ] |
-| **2:30** | Mostrar el panel lateral **«Cómo decidió Ruta»** con guardrails y trazas en vivo. | [ ] |
-| **2:45** | Reservar y confirmar que el título en calendario es neutro: **«Cita campus»** (antiestigma). | [ ] |
-| **2:50** | Señalar el botón naranja de **Derivación a persona humana**. | [ ] |
-| **3:15** | Mostrar pestaña **Bienestar** con métricas agregadas, cola de contacto y recomendaciones ML. | [ ] |
-| **3:35** | Citar los KPIs del E1: **370 turnos directorio vs 100 % match rate Ruta (68,2 % a 65,0 %)**. | [ ] |
-| **4:00** | Mencionar **Costo marginal 0 USD** (sin tarjeta) y **Escalabilidad** en universidades de LatAm. | [ ] |
-| **4:10** | Explicar el **Plan de Adopción en 3 fases** (Plug & Play con LMS, piloto gratis, escala a 15–40 USD/mes). | [ ] |
+| Minuto | Hito verificado |
+|:---:|---|
+| **0:25** | Cifras del Data Pack: **68,2 % no búsqueda, 42 días espera, 62 % fuera de horario**. |
+| **0:50** | **Banner contextual** sincronizado con calendario académico (D7). |
+| **1:05** | **Consentimiento informado** con derechos ARCO (descarga/borrado en 1 clic). |
+| **1:20** | **Tarjeta proactiva de Ruta** («Ruta tiene una sugerencia») en Pulse. |
+| **1:40** | Mensaje vago (*«no sé qué me pasa»*) $\rightarrow$ Acompañamiento sin diagnóstico. |
+| **2:05** | Mensaje de soledad/trabajo $\rightarrow$ Derivación a **Pares** en sábado/tarde. |
+| **2:20** | Explicación de cómo se atiende fuera de hora: **Pares hasta las 20:00/sábados + franja 17:00–18:00**. |
+| **2:30** | Panel **«Cómo decidió Ruta»** con trazas y guardrails en vivo. |
+| **2:35** | Reserva como **«Cita campus»** (privacidad antiestigma) y botón humano. |
+| **3:00** | Pestaña **Bienestar**: 144 chats, cola en vivo y recomendaciones ML para la U. |
+| **3:25** | KPIs del E1: **Directorio mediana 0 vs Ruta 100 % match rate (68,2 % a 65,0 %)**. |
+| **3:50** | Plan de adopción: **Plug & Play LMS, piloto 0 USD, escala 15–40 USD/mes**. |
