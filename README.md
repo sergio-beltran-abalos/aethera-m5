@@ -268,7 +268,7 @@ data/            Data Pack (no redistribuir)
 
 | Parámetro | Detalle |
 |---|---|
-| **Enlace al video** | [Ver Video Demostrativo (4:18 min)](https://youtu.be/ENLACE_DE_VIDEO) *(o Google Drive público)* |
+| **Enlace al video** | [Ver Video Demostrativo en YouTube (04:18 min)](https://youtu.be/JFBAkNGrbpo) |
 | **Duración oficial** | **04:18 min** (258 s) · En el rango estricto de 3 a 5 minutos |
 | **Archivo de grabación** | `AETHERA E2 Video.mp4` (68,9 MB) |
 | **Formato técnico** | MP4 (H.264 / AAC) · Tema claro activo |
