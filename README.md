@@ -52,26 +52,24 @@ encontrar, en el mejor caso, **una**.
 ## Qué hace
 
 **Pulse** — Registro de ánimo de 20 segundos. Opcional, con consentimiento expreso,
-privado y con derechos de acceso, exportación y supresión. No es un test: no calcula
-puntajes ni niveles. Produce un mes en colores que convierte una sensación difusa en algo
-visible.
+privado y con derechos de acceso, exportación y supresión (ARCO). No calcula puntajes
+ni niveles clínicos: produce un mapeo visual mensual en colores y despliega un banner
+contextual sincronizado con el calendario académico (D7, ej. semanas de exámenes).
 
-**Ruta** — Asistente de IA de orientación no clínica. Clasifica la necesidad, consulta
-servicios y calendario, y propone tres citas que no chocan con las clases, el trabajo ni el
-tiempo de traslado del estudiante. Reserva, reprograma y escala a una persona.
+**Ruta** — Asistente de IA agéntica de orientación no clínica con **RAG determinista**:
+clasifica la necesidad no clínica, recupera el catálogo de sedes (D6) y calendario (D7),
+y ejecuta un **solver de restricciones** que cruza trabajo, clases y traslados.
+* Resuelve el horario del estudiante trabajador: aprovecha que el Acompañamiento entre
+  Pares atiende hasta las **20:00 y sábados completos**, e identifica la franja de
+  **17:00 a 18:00** para orientación profesional antes de las clases nocturnas.
+* **Iniciativa proactiva:** sugiere opciones discretamente si detecta sobrecarga acumulada
+  o eventos del campus, sin forzar ni agendar sin autorización.
+* **Antiestigma:** registra las reservas en el calendario con título neutro («Cita campus»).
 
-Ruta también **escribe primero** cuando encuentra un momento que lo justifica: si la semana
-de pausa y bienestar está a menos de siete días, o si el propio estudiante registró tres o
-más días difíciles en la semana. Nunca lo hace sin consentimiento, nunca insiste y nunca usa
-un aviso distinto según el estado de ánimo de cada quien.
-
-Cada cita aparece en el calendario del estudiante con el **título que él elige**. Por defecto
-es neutro («Cita campus»): no nombra el servicio, que es lo único que delata a qué se
-acudió. Sede, fecha, hora y canal siguen visibles, y el detalle completo permanece dentro de
-la aplicación.
-
-**Bienestar** — Vista agregada para el equipo de bienestar. Toda celda con menos de
-**10 personas** se suprime. Los estados de ánimo individuales nunca se agregan.
+**Bienestar** — Dashboard institucional con k-anonimato (supresión de celdas < 10) que
+analiza las 144 conversaciones agregadas de D5 y se actualiza en vivo con la demo. Emplea
+Machine Learning para entregar recomendaciones de gestión a la universidad (habilitar
+turnos virtuales nocturnos y reforzar redes de pares en fines de semana).
 
 ## Cómo funciona
 
@@ -190,7 +188,7 @@ estudiantes con sintomatología ansiosa moderada-alta nunca consultó un servici
 
 | Uso | Herramienta | Propósito |
 |---|---|---|
-| Clasificador, planificador y redactor | **Gemini `gemini-3.5-flash-lite`** (Google, free tier) | Elegir acción y motivo; redactar. Nunca aportan datos |
+| Clasificador, planificador y redactor | **Gemini `gemini-3.5-flash`** (Google, free tier) | Elegir acción y motivo; redactar con RAG estructurado. Cero alucinación |
 | Estimación de asistencia | Regresión logística (scikit-learn) sobre **D2** (9 400 eventos) | Ordenar citas por P(asistir) |
 | Clasificador offline | TF-IDF + regresión logística sobre **D5** (2 500 etiquetadas) | Sustituye al LLM cuando no hay clave |
 

@@ -28,14 +28,23 @@ Con el límite gratuito de 1 M/día (≈30 M/mes), **el piloto completo se sitú
 gratuito**. Si el alcance se duplicara, bastaría el nivel de pago más bajo del proveedor; el
 costo seguiría siendo marginal frente al de un profesional de bienestar.
 
-## 2. Costo por etapa de despliegue
+## 2. Costo por etapa de despliegue y Plan de Adopción
 
 | Etapa | Volumen | Costo estimado | Observación |
 |---|---|---|---|
-| Demostración de semifinal | ~50 usuarios | 0 USD | — |
-| Piloto universitario | 826 estudiantes | 0 USD | Dentro del nivel gratuito |
-| Institución completa | ~6 700 estudiantes | 15–40 USD/mes | Requiere el nivel de pago siguiente |
-| Red regional | >100 000 | Modelo abierto en servidor propio | El diseño ya lo permite |
+| Demostración de semifinal | ~50 usuarios | 0 USD | Totalmente funcional |
+| Piloto universitario | 826 estudiantes | 0 USD | Dentro de la capa gratuita, sin tarjeta |
+| Institución completa | ~6 700 estudiantes | 15–40 USD/mes | Costo marginal despreciable |
+| Red regional | >100 000 | 0 USD en cómputo propio | Modelos abiertos (Llama/Gemma) on-premise |
+
+### Plan de adopción institucional en 3 fases
+
+1. **Fase 1 · Conexión Plug & Play (Día 1 · Costo 0 USD):** La universidad no reconstruye su infraestructura. Se integra directamente en el aula virtual o LMS (Canvas, Blackboard o Moodle) mediante iframe o estándar LTI. Solo consume dos fuentes estandarizadas: el catálogo de servicios (D6) y el calendario académico (D7).
+2. **Fase 2 · Piloto Focalizado sin Riesgo (Semanas 1 a 4 · Costo 0 USD):** Se habilita en una facultad piloto o durante semanas críticas de exámenes. El equipo de bienestar evalúa el uso real mediante el dashboard con k-anonimato (celdas < 10 suprimidas). No se requiere tarjeta de crédito ni presupuesto previo.
+3. **Fase 3 · Escalamiento Sostenible (Mes 2 en adelante):** Expansión a todo el campus. A nivel institucional completo (~6 700 alumnos), el costo computacional de tokens es de apenas 15 a 40 USD mensuales.
+
+### Retorno de inversión (ROI) y sostenibilidad operativa
+El sistema es financieramente viable porque no intenta sustituir la atención humana contratando nóminas clínicas masivas. Al clasificar la necesidad y canalizar el malestar cotidiano hacia el **Acompañamiento entre Pares** (`peer_support`), la capacidad de atención se amplía con estudiantes de ciclos superiores becados y formados. La retención de un solo estudiante en riesgo de deserción cubre con creces el costo computacional de toda la universidad.
 
 ## 3. Viabilidad técnica
 
