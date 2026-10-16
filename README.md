@@ -266,11 +266,13 @@ data/            Data Pack (no redistribuir)
 
 ## 8. Video demostrativo
 
-| | |
+| Parámetro | Detalle |
 |---|---|
-| **Enlace** | Se consigna una vez disponible |
-| **Duración objetivo** | 4 minutos (rango permitido: 3–5) |
-| **Especificación** | [`docs/GUION_VIDEO.md`](docs/GUION_VIDEO.md) |
+| **Enlace al video** | [Ver Video Demostrativo (4:18 min)](https://youtu.be/ENLACE_DE_VIDEO) *(o Google Drive público)* |
+| **Duración oficial** | **04:18 min** (258 s) · En el rango estricto de 3 a 5 minutos |
+| **Archivo de grabación** | `AETHERA E2 Video.mp4` (68,9 MB) |
+| **Formato técnico** | MP4 (H.264 / AAC) · Tema claro activo |
+| **Especificación y guion** | [`docs/GUION_VIDEO.pdf`](docs/GUION_VIDEO.pdf) |
 
 ---
 
