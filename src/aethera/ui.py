@@ -337,7 +337,7 @@ def construir():
 
         # ── Conexiones ───────────────────────────────────────────────────────
         salidas = [estado, chat, ficha, track, frase, panel, reservas, bienestar, archivo, mood,
-                   aviso_ruta, btn_ir_ruta]
+                   aviso_ruta, btn_ir_ruta, aviso]
         entradas = [sel_perfil, sel_fecha, chk_historial]
 
         def _init(nombre, fecha, hist):
@@ -345,7 +345,7 @@ def construir():
                 reservas_html, bien_html, archivo_out, _ = _reiniciar(nombre, fecha, hist)
             return (sesion, chat0, ficha_html, track_html, frase_html, panel_html,
                     reservas_html, bien_html, archivo_out, None, "",
-                    gr.update(visible=False))
+                    gr.update(visible=False), vistas.html_aviso())
 
         app.load(_init, entradas, salidas)
         for control in (sel_perfil, sel_fecha, chk_historial):
