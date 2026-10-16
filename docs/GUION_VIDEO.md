@@ -14,7 +14,7 @@ Cada segundo de este guion está diseñado para sumar el puntaje máximo en los 
 | **Innovación y enfoque tecnológico** | **20 %** | Arquitectura agéntica en 3 capas (clasificador no clínico, planificador de acciones, redactor controlado), solver de restricciones de horarios y disparadores proactivos. |
 | **Comprensión del problema** | **15 %** | Fundamentación cuantitativa de M5 con Data Pack: 68,2 % de no búsqueda, 42 días de espera en D2, 62 % de consultas fuera de oficina y 50 % nocturnas en D5. |
 | **IA Responsable** | **15 %** | Consentimiento informado ARCO (descarga y borrado en 1 clic), privacidad en calendario («Cita campus»), panel de transparencia en vivo («Cómo decidió Ruta»), guardrails clínicos y derivación humana inmediata. |
-| **Viabilidad y sostenibilidad** | **15 %** | Costo marginal ≈ 0 USD (corre en capa gratuita y con respaldo offline sin LLM), sin requerir tarjetas de crédito ni servidores de pago. |
+| **Viabilidad y sostenibilidad** | **15 %** | Plan de adopción en 3 fases: piloto a costo cero (0 USD en capa gratuita sin tarjeta), escalamiento a 15–40 USD/mes para todo el campus, y modelo de pares que evita contratar nóminas clínicas exorbitantes. |
 | **Impacto social** | **15 %** | Match rate del 100 % en turnos viables frente al 28,2 % del directorio tradicional. Reducción estimada de la no búsqueda del 68,2 % al 65,0 % (187 estudiantes alcanzados). |
 | **Escalabilidad** | **10 %** | Replicable en cualquier universidad de Chile, Perú o Latinoamérica reemplazando únicamente el mapa de servicios (D6) y calendario académico (D7). Modelo de pares que no satura al equipo clínico. |
 | **Calidad del pitch** | **10 %** | Narración fluida, estructurada, sincronizada con la pantalla y con respaldo riguroso de cada cifra. |
@@ -137,20 +137,24 @@ ESTRUCTURA: 5 BLOQUES
 
 ---
 
-### BLOQUE 5 · Viabilidad, Escalabilidad y Cierre (3:45 – 4:15)
+### BLOQUE 5 · Plan de Adopción, Viabilidad y Cierre (3:45 – 4:20)
 **Criterios evaluados:** *Viabilidad y sostenibilidad (15 %) · Escalabilidad (10 %)*
 
 * **Qué muestras en pantalla:**
-  * Puedes mostrar el pie de página de la aplicación (`Aethera es una ciudad universitaria ficticia... proveedor de IA: gemini · costo ≈ 0 USD`), o la documentación técnica en GitHub / README con las pruebas unitarias verdes.
+  * Muestra el pie de página de la aplicación (`Aethera es una ciudad universitaria ficticia... proveedor de IA: gemini · costo ≈ 0 USD`), o la documentación de arquitectura técnica en el repositorio (por ejemplo, el archivo `COSTOS.md` o la sección de despliegue).
 
 * **Qué dices en voz alta:**
-  > «Para concluir, dos factores hacen que esta solución sea inmediatamente aplicable:
+  > «Para que esto no quede en un prototipo de laboratorio, diseñamos un **Plan de Adopción Institucional en 3 fases**, pensado para que cualquier universidad vea su viabilidad técnica y económica inmediata:
   >
-  > Primero, **Viabilidad y costo marginal cero**: la solución opera completamente dentro de la capa gratuita de modelos de lenguaje y cuenta con un sistema de respaldo de reglas y ML local, garantizando que funcione incluso sin conexión y sin requerir un solo dólar en tarjetas de crédito ni infraestructura privativa.
+  > 1. **Fase 1 · Integración Plug & Play:** La universidad no tiene que reinventar sus sistemas. La plataforma se embebe directamente en el portal estudiantil o aula virtual existente (como Canvas o Blackboard). Solo requiere alimentar dos archivos estándar: el catálogo de servicios de bienestar y el calendario de exámenes.
   >
-  > Segundo, **Escalabilidad regional**: el sistema desacopla la lógica agéntica de los datos del campus. Replicar Aethera en cualquier otra universidad de Chile, Perú o la región toma menos de una tarde: basta con alimentar el archivo GeoJSON de sedes y el calendario de periodos académicos. Al apoyarse en la red de pares formados, la capacidad de atención crece sin saturar la nómina clínica de la institución.
+  > 2. **Fase 2 · Piloto a Costo Cero (0 USD):** La universidad puede validar el impacto con un piloto de hasta 1.000 estudiantes a **costo cero absoluto**. Opera 100 % dentro de la capa gratuita de IA y con respaldos locales sin requerir tarjeta de crédito, contratos de nube costosos ni infraestructura adicional.
   >
-  > Aethera Pulse + Ruta no sustituye a los profesionales de la salud; derriba las barreras de horario, fricción y estigma para que ningún estudiante se quede sin el apoyo que necesita. Muchas gracias.»
+  > 3. **Fase 3 · Escalamiento Institucional Sostenible:** Al expandirlo a toda la universidad (6.000 a 10.000 alumnos), el consumo computacional de IA apenas ronda entre **15 y 40 USD mensuales** —o costo cero si la institución prefiere correr modelos abiertos como Llama en sus propios servidores—. 
+  >
+  > Además, el modelo es financieramente sostenible porque no exige contratar decenas de psicólogos clínicos adicionales: la IA resuelve la saturación derivando el malestar cotidiano y la soledad hacia la **red de pares estudiantiles**, reservando a los profesionales de salud para casos clínicos prioritarios. Evitar la deserción de un solo alumno amortiza con creces el sistema completo.
+  >
+  > Aethera Pulse + Ruta demuestra que con IA responsable, diseño centrado en el estudiante y costo marginal cero, es posible democratizar el bienestar universitario en toda América Latina. Muchas gracias.»
 
 ---
 
@@ -170,3 +174,4 @@ ESTRUCTURA: 5 BLOQUES
 | **3:15** | Mostrar pestaña **Bienestar** con métricas agregadas, cola de contacto y recomendaciones ML. | [ ] |
 | **3:35** | Citar los KPIs del E1: **370 turnos directorio vs 100 % match rate Ruta (68,2 % a 65,0 %)**. | [ ] |
 | **4:00** | Mencionar **Costo marginal 0 USD** (sin tarjeta) y **Escalabilidad** en universidades de LatAm. | [ ] |
+| **4:10** | Explicar el **Plan de Adopción en 3 fases** (Plug & Play con LMS, piloto gratis, escala a 15–40 USD/mes). | [ ] |
