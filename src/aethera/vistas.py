@@ -379,8 +379,10 @@ def html_panel_traza(sesion) -> str:
         # reason_code y confianza los aporta el LLM; el disparador proactivo
         # decide el motivo por regla, asi que se muestran solo si existen.
         if c.get("reason_code"):
+            conf = c.get("confianza")
+            detalle = f"confianza {conf:.2f}, " if isinstance(conf, (int, float)) else ""
             L.append(f"- 🏷️ **Necesidad** · `{c['reason_code']}` "
-                     f"(confianza {c.get('confianza', 0):.2f}, vía {c.get('metodo', 'regla')})")
+                     f"({detalle}vía {c.get('metodo', 'regla')})")
         else:
             L.append(f"- 🏷️ **Necesidad** · `{c.get('etiqueta', 'sin clasificar')}` "
                      f"_(elegida por regla)_")

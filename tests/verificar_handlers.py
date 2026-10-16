@@ -67,7 +67,23 @@ if "Responde con el número" in (aviso or ""):
 else:
     print("  . la tarjeta resume y deja el detalle en la conversacion OK")
 
-# 4d. el boton de hablar no adelanta propuestas: la iniciativa es del estudiante
+# 4d. la sugerencia anuncia las citas sin volcarlas: se revelan al pedirlas
+if chat and "Responde con el número" in str(chat[-1]["content"]):
+    fallos.append("la sugerencia proactiva vuelca las citas en el chat")
+    print("  x la sugerencia proactiva ya lista las citas")
+else:
+    print("  . la sugerencia anuncia las citas y no las vuelca OK")
+
+# 4e. y el atajo las revela sin pasar por la conversación
+r_citas = check("_ver_citas", ui._ver_citas(sesion, chat), 4)
+chat_citas, sesion, panel_citas, reservas_citas = r_citas
+if chat_citas and "Responde con el número" in str(chat_citas[-1]["content"]):
+    print("  . el atajo revela las citas sin conversar OK")
+else:
+    fallos.append("el atajo de citas no mostró la lista")
+    print("  x el atajo de citas no muestra la lista")
+
+# 4f. el boton de hablar no adelanta propuestas: la iniciativa es del estudiante
 fresca = agente.Sesion(tarjetas_demo()[nombre], nombre, servicios.Agenda(desde=C.FECHA_DEMO))
 fresca.consentimiento_pulse = True
 fresca.mood_track = pulso.historial_ejemplo(nombre)
@@ -126,6 +142,7 @@ for nombre, fn, args, esperados in [
     ("_descargar", ui._descargar, (None,), 1),
     ("_enviar", ui._enviar, ("hola", None, []), 6),
     ("_persona", ui._persona, (None, []), 4),
+    ("_ver_citas", ui._ver_citas, (None, []), 4),
 ]:
     try:
         check(nombre, fn(*args), esperados)

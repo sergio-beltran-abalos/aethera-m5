@@ -25,6 +25,15 @@ EVENTOS: list[dict] = []          # bitácora para KPIs (se recalculan en vivo)
 SOLICITUDES_CONTACTO: list[dict] = []
 _SESIONES = itertools.count(1)
 
+# Cuántas veces Ruta puede preguntar «¿qué te pasa?» sin llegar a un motivo antes
+# de ofrecer un espacio igual. Quien no sabe nombrar lo que siente es justamente a
+# quien busca la misión: nunca se lo deja sin salida por no haberle puesto nombre.
+MAX_EXPLORACION = 2
+
+# Motivo con el que se ofrece cuando el estudiante no logró nombrar nada. Es el
+# único que no exige haber identificado un problema, y por eso el único honesto aquí.
+MOTIVO_SIN_NOMBRE = "preventive_guidance"
+
 # Sedes del campus. Los identificadores del Data Pack son DIST_GAIA, DIST_VECTOR…
 # y no son presentables: se traduce una vez para no repetir el .replace() en cada
 # capa y para que la interfaz diga siempre lo mismo.
@@ -83,6 +92,11 @@ class Sesion:
         self.hora_inicio = None
         self.estilo_evento = "neutro"          # por defecto, el que menos revela
         self.disparadores_vistos: set[str] = set()
+        # Acompañamiento sin motivo claro: cuántas veces Ruta preguntó y qué
+        # motivo dejó pendiente el disparador proactivo, para no reclasificar
+        # un "sí" ni un "muéstrame las citas".
+        self.exploradas = 0
+        self.motivo_pendiente: str | None = None
 
     def registrar(self, evento: str, **datos) -> None:
         EVENTOS.append({"sesion": self.id, "evento": evento, "turno": self.turnos, **datos})
@@ -265,6 +279,18 @@ def plantilla(accion: str, resultados: dict, sesion: Sesion) -> str:
     intro = ("Soy Ruta, un asistente de IA de orientación (no clínica). "
              if not sesion.presentado else "")
 
+    if accion == "explorar":
+        ops = resultados.get("proponer_opciones")
+        if ops and ops["opciones"]:
+            return (f"{intro}No necesitas tener claro qué te pasa para que te ayude 🤍 "
+                    f"Estos espacios calzan con tu horario:\n{lista_opciones(ops['opciones'])}"
+                    "\n\n¿Cuál te acomoda? Y si prefieres, sigue contándome y lo vemos juntos.")
+        return (f"{intro}Gracias por contármelo. No hace falta que lo tengas claro: a veces "
+                "aparece antes la sensación que el nombre. ¿Te suena alguna de estas? «me cuesta "
+                "dormir o descansar», «siento que no me alcanza el tiempo», «me siento solo/a en "
+                "la U», «no sé qué haré cuando termine la carrera». O cuéntamelo con tus "
+                "palabras: no hay prisa y no tienes que contarme todo 🤍")
+
     if accion == "orientar":
         c = resultados["clasificar"]
         ops = resultados["proponer_opciones"]
@@ -347,6 +373,29 @@ def plantilla(accion: str, resultados: dict, sesion: Sesion) -> str:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# Propuesta vigente
+# ─────────────────────────────────────────────────────────────────────────────
+def _motivo_vigente(sesion: Sesion) -> str:
+    return sesion.motivo_pendiente or sesion.motivo or MOTIVO_SIN_NOMBRE
+
+
+def _clasificacion_vigente(sesion: Sesion) -> dict:
+    """La clasificación que Ruta ya había usado, sin volver a adivinar."""
+    motivo = _motivo_vigente(sesion)
+    return {"reason_code": motivo, "etiqueta": C.MOTIVOS[motivo], "confianza": None,
+            "resumen": "", "metodo": "propuesta vigente"}
+
+
+def _propuesta_vigente(sesion: Sesion) -> dict:
+    """La propuesta que Ruta ya dejó, para volver a mostrarla sin recalcularla."""
+    from . import datos
+    tipo = datos.mapa_motivo_servicio()[_motivo_vigente(sesion)]
+    return {"tipo_principal": C.TIPO_ES[tipo], "opciones": list(sesion.opciones),
+            "nota": None, "nota_preferencia": None,
+            "seguimiento_humano": any(o["es_puente_pares"] for o in sesion.opciones)}
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Ejecución de herramientas
 # ─────────────────────────────────────────────────────────────────────────────
 def ejecutar(plan: dict, texto: str, sesion: Sesion) -> dict:
@@ -355,6 +404,16 @@ def ejecutar(plan: dict, texto: str, sesion: Sesion) -> dict:
     filtros = {k: plan.get(k) for k in ["evitar_dias", "franja", "canal_preferido"] if plan.get(k)}
 
     if accion == "orientar":
+        # Si Ruta ya había propuesto algo (disparador proactivo o atajo de citas) y
+        # el estudiante pide verlo o acepta sin más, no se reclasifica: «sí» o
+        # «muéstrame las citas» no son un motivo, y reclasificarlos mandaría la
+        # propuesta a otro servicio distinto del que la justificó.
+        if sesion.opciones and (ia.pide_ver_citas(texto) or ia.es_aceptacion(texto)):
+            res["clasificar"] = _clasificacion_vigente(sesion)
+            res["proponer_opciones"] = _propuesta_vigente(sesion)
+            sesion.registrar("opciones_mostradas", n=len(sesion.opciones), origen="vigente")
+            return res
+
         res["clasificar"] = ia.clasificar(texto)
         sesion.motivo = res["clasificar"]["reason_code"]
 
@@ -376,10 +435,27 @@ def ejecutar(plan: dict, texto: str, sesion: Sesion) -> dict:
             tipo="peer_support" if plan.get("prefiere_pares") else None, **filtros)
 
         sesion.opciones = res["proponer_opciones"]["opciones"]
+        sesion.motivo_pendiente = sesion.motivo
         sesion.registrar("busco_ayuda", motivo=sesion.motivo)
         sesion.registrar("opciones_mostradas", n=len(sesion.opciones))
         if not sesion.opciones:
             sesion.registrar("sin_opciones")
+
+    elif accion == "explorar":
+        # El estudiante no sabe qué le pasa. Ruta acompaña; no deriva todavía.
+        sesion.exploradas += 1
+        sesion.registrar("acompano_sin_motivo", n=sesion.exploradas)
+
+        if sesion.exploradas > MAX_EXPLORACION:
+            # Ya se acompañó lo suficiente. Se ofrece un espacio sin exigir que haya
+            # puesto nombre a lo que le pasa: ese es el caso que la misión busca.
+            sesion.motivo = MOTIVO_SIN_NOMBRE
+            sesion.motivo_pendiente = MOTIVO_SIN_NOMBRE
+            res["proponer_opciones"] = servicios.proponer_opciones(
+                sesion.perfil, MOTIVO_SIN_NOMBRE, sesion.agenda)
+            sesion.opciones = res["proponer_opciones"]["opciones"]
+            res["sin_nombre"] = True
+            sesion.registrar("opciones_mostradas", n=len(sesion.opciones), origen="sin_motivo")
 
     elif accion == "informar":
         res["catalogo"] = ia.catalogo()
@@ -466,11 +542,18 @@ def ofrecer_proactivamente(sesion: Sesion) -> tuple[str | None, dict | None]:
         return None, None
 
     sesion.motivo = motivo
+    sesion.motivo_pendiente = motivo
     sesion.opciones = ops["opciones"]
 
+    # La sugerencia ANUNCIA que hay citas; no las vuelca. Quien quiera verlas las
+    # pide (tarjeta en Pulse o botón en Ruta) y entonces sí aparecen. Volcarlas aquí
+    # convertía el primer contacto en un trámite de reserva.
+    n = len(ops["opciones"])
+    encontradas = f"{n} cita" + ("" if n == 1 else "s")
     cuerpo = (disparadores.texto_oferta(oferta) + "\n\n"
-              "Estas son las que calzan con tu horario:\n" + lista_opciones(ops["opciones"])
-              + "\n\n¿Cuál te acomoda? Responde con el número.")
+              f"Te encontré {encontradas} que calzan con tu horario. Si quieres verlas, dime "
+              "«muéstrame las citas» y te las dejo aquí. Y si todavía no sabes bien qué te "
+              "pasa, cuéntame y lo vemos juntos 🙂")
     intro = "" if sesion.presentado else (
         "Soy Ruta, un asistente de IA de orientación (no clínica). ")
 
@@ -493,6 +576,53 @@ def ofrecer_proactivamente(sesion: Sesion) -> tuple[str | None, dict | None]:
     sesion.presentado = True
     sesion.registrar("oferta_proactiva", tipo=oferta["tipo"], motivo=motivo)
     return intro + cuerpo, oferta
+
+
+def mostrar_citas(sesion: Sesion) -> tuple[str, dict]:
+    """
+    Segunda puerta: ver las citas sin haber conversado antes.
+
+    Quien ya sabe que quiere horarios no tiene por qué contarle nada a Ruta. Si hay
+    una propuesta vigente (la dejó el disparador proactivo) se reutiliza tal cual; si
+    no, se propone orientación general, el único servicio que no exige haberle puesto
+    un nombre al problema.
+    """
+    t0 = time.time()
+    vigente = bool(sesion.opciones)
+
+    if vigente:
+        clasificar = _clasificacion_vigente(sesion)
+        ops = _propuesta_vigente(sesion)
+        encabezado = "Estas son las citas que te dejé antes:"
+    else:
+        sesion.motivo = sesion.motivo_pendiente = MOTIVO_SIN_NOMBRE
+        clasificar = {"reason_code": MOTIVO_SIN_NOMBRE, "etiqueta": C.MOTIVOS[MOTIVO_SIN_NOMBRE],
+                      "confianza": None, "resumen": "",
+                      "metodo": "orientación general (sin motivo declarado)"}
+        ops = servicios.proponer_opciones(sesion.perfil, MOTIVO_SIN_NOMBRE, sesion.agenda)
+        sesion.opciones = ops["opciones"]
+        encabezado = "Claro. Estas citas calzan con tu horario:"
+
+    if ops["opciones"]:
+        texto = (f"{encabezado}\n{lista_opciones(ops['opciones'])}\n\n"
+                 "¿Cuál te acomoda? Responde con el número, o dime si ninguna te sirve y busco "
+                 "otras. Y si prefieres contarme primero qué te está pesando, también sirve 🙂")
+    else:
+        texto = ("No encontré turnos compatibles con tu horario en las próximas dos semanas. "
+                 "Dejo registrado un seguimiento para que el equipo de bienestar te contacte.")
+
+    resultados = {"clasificar": clasificar, "proponer_opciones": ops}
+    sesion.historial.append({"rol": "ruta", "texto": texto})
+    sesion.trazas.append({
+        "turno": sesion.turnos, "mensaje": "(ver citas)",
+        "guardrail_entrada": "permitido", "accion": "orientar",
+        "herramientas": ["proponer_opciones"], "resultados": resultados,
+        "redaccion": "plantilla de citas", "guardrail_salida": "ok",
+        "segundos": round(time.time() - t0, 2)})
+    sesion.presentado = True
+    sesion.registrar("opciones_mostradas", n=len(ops["opciones"]),
+                     origen="vigente" if vigente else "atajo")
+    return texto, resultados
 
 
 def procesar_mensaje(sesion: Sesion, texto: str) -> tuple[str, dict]:

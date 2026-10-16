@@ -170,6 +170,5 @@ def texto_oferta(oferta: dict) -> str:
     vigilancia.
     """
     return (f"{oferta['frase']}\n\n"
-            f"Te escribo porque veo el calendario de la universidad y, si diste tu "
-            f"consentimiento, tu registro de Pulse. Si te sirve, elige un número y lo dejo "
-            f"agendado; si no, seguimos sin cita.")
+            f"Te escribo yo, sin que me lo hayas pedido: veo el calendario de la universidad y, "
+            f"si diste tu consentimiento, tu registro de Pulse. Nada de esto es obligatorio.")

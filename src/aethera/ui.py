@@ -140,12 +140,30 @@ def _abrir_chat(sesion, chat, estilo_evento):
         if any(e["fecha"] == C.FECHA_DEMO for e in sesion.mood_track):
             texto = pulso.abrir_chat(sesion)
         else:
-            texto = ("Cuéntame qué está pasando y busco un espacio que te sirva. "
-                     "Si registras tu día en Pulse primero, uso ese registro para "
-                     "afinar la propuesta.")
+            texto = ("Hola 👋 Soy Ruta, un asistente de IA de orientación (no clínica). "
+                     "Cuéntame cómo has estado. Si algo te está pesando, lo vemos con calma y, "
+                     "cuando lo tengamos claro, te busco un espacio que calce con tu horario. "
+                     "Y si prefieres ir directo a los horarios, toca «Ver las citas disponibles».")
         chat = [{"role": "assistant", "content": texto}]
     return (chat, sesion, vistas.html_panel_traza(sesion), "",
             gr.update(visible=False))
+
+
+def _ver_citas(sesion, chat):
+    """
+    Muestra las citas sin pasar por la conversación.
+
+    Lo usan dos botones: la tarjeta que Ruta deja en Pulse y el atajo de la pestaña
+    Ruta. Es la puerta de quien ya sabe que quiere horarios y no quiere contar antes
+    qué le pasa.
+    """
+    import gradio as gr
+    if sesion is None:
+        gr.Warning("Un momento: todavía se está preparando la sesión.")
+        return chat, sesion, "", ""
+    texto, _ = agente.mostrar_citas(sesion)
+    chat = (chat or []) + [{"role": "assistant", "content": texto}]
+    return (chat, sesion, vistas.html_panel_traza(sesion), vistas.tabla_reservas_html())
 
 
 
@@ -256,7 +274,7 @@ def construir():
                         # pestana y el estudiante no se enteraria: se muestra aqui
                         # y se ofrece el salto.
                         aviso_ruta = gr.HTML()
-                        btn_ir_ruta = gr.Button("💬  Ver la propuesta en Ruta",
+                        btn_ir_ruta = gr.Button("📅  Ver las citas que me sirven",
                                                 elem_id="btn-ir-ruta", visible=False)
 
                     with gr.Column(scale=6, elem_classes="panel"):
@@ -289,6 +307,8 @@ def construir():
                                              elem_id="entrada")
                         btn_persona = gr.Button("🙋  Quiero que una persona me contacte",
                                                 elem_id="btn-persona")
+                        btn_citas = gr.Button("📅  Ver las citas disponibles",
+                                              elem_id="btn-citas")
                         gr.Examples(
                             ["¿Qué apoyos hay en la universidad?",
                              "Trabajo todo el día y me siento solo en la U",
@@ -343,7 +363,9 @@ def construir():
         btn_hablar.click(_abrir_chat, [estado, chat, estilo_evento],
                          [chat, estado, panel, aviso_ruta, btn_ir_ruta],
                          js=IR_A_RUTA_JS)
-        btn_ir_ruta.click(None, js=IR_A_RUTA_JS)
+        btn_ir_ruta.click(_ver_citas, [estado, chat], [chat, estado, panel, reservas],
+                          js=IR_A_RUTA_JS)
+        btn_citas.click(_ver_citas, [estado, chat], [chat, estado, panel, reservas])
         btn_borrar.click(_borrar, [estado], [track, frase, estado, archivo])
         btn_descargar.click(_descargar, [estado], [archivo])
         entrada.submit(_enviar, [entrada, estado, chat],

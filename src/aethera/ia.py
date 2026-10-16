@@ -283,7 +283,7 @@ def clasificar(texto: str) -> dict:
 # ─────────────────────────────────────────────────────────────────────────────
 # 2 · Planificador
 # ─────────────────────────────────────────────────────────────────────────────
-ACCIONES = ["orientar", "informar", "reservar", "replanificar", "calendario",
+ACCIONES = ["orientar", "explorar", "informar", "reservar", "replanificar", "calendario",
             "contacto_humano", "conversar"]
 
 INSTR_PLANIFICADOR = """
@@ -291,8 +291,12 @@ Eres el PLANIFICADOR de Ruta, agente de orientación no clínica de una universi
 No respondes al estudiante: decides la acción.
 
 ACCIONES:
-- orientar: cuenta una dificultad o pide ayuda/apoyo/hablar con alguien → clasificar su
-  necesidad y proponer citas.
+- orientar: cuenta una dificultad y se entiende DE QUÉ se trata (estudios, descanso, soledad,
+  futuro laboral), o pide ver las citas que Ruta le ofreció → clasificar su necesidad y
+  proponer citas.
+- explorar: dice que no sabe qué le pasa, no alcanza a nombrarlo, o su mensaje es tan vago que
+  clasificarlo sería adivinar ("no sé cómo me siento", "ando raro", "no sé explicarlo").
+  Ruta acompaña y ayuda a ponerle nombre; todavía NO propone ninguna cita.
 - informar: pregunta qué es Aethera o Ruta, qué servicios hay, cómo funcionan u horarios,
   sin contar una dificultad propia.
 - reservar: ya se le mostraron opciones y elige una (por número o descripción).
@@ -303,6 +307,10 @@ ACCIONES:
 - conversar: saludo, agradecimiento, charla breve, pedidos fuera del rol de Ruta (resolver
   tareas, otros temas) o algo que no encaja. En los pedidos fuera de rol marca
   "fuera_de_rol": true.
+
+Ante la duda entre orientar y explorar, elige explorar. Derivar a alguien sin haber entendido
+su motivo lo manda a un servicio que no le corresponde: es peor que preguntar. Un mensaje que
+solo dice "estoy mal", "no sé" o "ando raro" NO es motivo suficiente para orientar.
 
 Extrae también, si aparecen: días que NO puede (0=lunes … 6=domingo), franja preferida
 (mañana, tarde, noche; "temprano" = mañana, "final de la tarde" = tarde, "horario extendido"
@@ -326,6 +334,48 @@ DIFICULTAD = (r"me siento|estoy |no puedo|me cuesta|tengo (problemas|ansiedad|mi
 PREGUNTA_INFO = (r"que (servicios|apoyos|tipo de apoyo|es|son|hace|ofrece|puedes)|como funciona|"
                  r"horario de|donde (queda|esta)|quien eres|que es (aethera|ruta)|que hay en")
 FUERA_DE_ROL = r"resuelve|resolver|hazme|haz mi|hacer mi (tarea|trabajo)|respuestas? de(l)? (examen|tarea)"
+
+# Mensajes en los que el estudiante todavía no puede nombrar lo que siente. Son la
+# razón de ser de `explorar`: sobre ellos el clasificador devuelve confianzas de
+# 0,2–0,5 y acierta por azar ("ando bajoneado" → presión académica), así que
+# derivar sería mandarlo a un servicio que no le toca.
+VAGO = (
+    r"no se (como|que) (me siento|me pasa|sentir|explicar|decir|ponerle nombre)|"
+    r"no se (explicarlo|ponerle nombre|bien (que|como)|ni (que|por que))|"
+    r"no lo (se|tengo) (bien )?(claro|definido)|"
+    r"(me siento|estoy|ando) (raro|extrano|mal|regular|bajoneado|bajon|vacio|perdid|confundid)|"
+    r"no tengo idea de (que|lo que)|"
+    r"no se que (hacer|decir|necesito|quiero|me pasa)|"
+    r"no se si (es|tengo|deberia|esto)|"
+    r"nada en particular|no podria decir|no se bien|"
+    r"^no se$|^no se no se$|^nada$|^no se nada$|^no se explicarlo$"
+)
+
+# El estudiante pide ver las citas que Ruta le ofreció (por el disparador proactivo
+# o por el botón de la pestaña Ruta).
+VER_CITAS = (
+    r"(ver|muestra|muestrame|ensename|dame|lista|quiero ver|cuales son)\s+(las\s+)?"
+    r"(citas?|opciones?|turnos?|horarios?|espacios?|disponibles?|propuesta)|"
+    r"citas? disponibles|ver (la )?propuesta|"
+    r"que (citas|opciones|turnos|horarios) (hay|tienes)|"
+    r"que dias? (hay|tienes)|cuando (hay|tienes)"
+)
+
+AFIRMACION = (r"\s*(si|sii|sip|claro|ok|okay|dale|bueno|por favor|porfa|de acuerdo|esta bien|"
+              r"vale|obvio|perfecto|genial|yes)(\s+(por favor|porfa|gracias|dale))?\s*")
+
+
+def es_vago(texto: str) -> bool:
+    """El estudiante no alcanza a nombrar lo que siente."""
+    return bool(re.search(VAGO, normalizar(texto)))
+
+
+def pide_ver_citas(texto: str) -> bool:
+    return bool(re.search(VER_CITAS, normalizar(texto)))
+
+
+def es_aceptacion(texto: str) -> bool:
+    return bool(re.fullmatch(AFIRMACION, normalizar(texto)))
 
 
 def extraer_numero_opcion(t: str) -> int | None:
@@ -365,7 +415,7 @@ def plan_respaldo(texto: str, sesion) -> dict:
     pide_persona = re.search(r"que me (contacten|llamen|escriban)|contacte(n)? una persona|"
                              r"hablar con una persona|persona (real|humana)|avisales|"
                              r"avisa a bienestar|pide que me contacten", t)
-    afirma = re.fullmatch(r"\s*(si|claro|ok|dale|por favor|bueno)(\s+(por favor|porfa|avisales|gracias))?\s*", t)
+    afirma = re.fullmatch(AFIRMACION, t)
 
     if pide_persona or (sesion.oferta_contacto and afirma):
         accion = "contacto_humano"
@@ -373,6 +423,10 @@ def plan_respaldo(texto: str, sesion) -> dict:
         accion = "replanificar"
     elif sesion.opciones and n and not sesion.reserva:
         accion = "reservar"
+    elif sesion.opciones and (re.search(VER_CITAS, t) or afirma):
+        # Ruta ya había propuesto algo (disparador o botón) y ahora lo pide. Se
+        # muestran esas citas, no se reclasifica un "sí" ni un "muéstrame".
+        accion = "orientar"
     elif n and len(t.split()) <= 3:
         accion = "conversar"
     elif re.search(FUERA_DE_ROL, t):
@@ -383,6 +437,8 @@ def plan_respaldo(texto: str, sesion) -> dict:
         accion = "calendario"
     elif re.fullmatch(r"\s*(hola|buenas|buenos dias|buenas tardes|buenas noches|gracias|ok|vale|chau)\s*", t):
         accion = "conversar"
+    elif re.search(VAGO, t):
+        accion = "explorar"
     else:
         accion = "orientar"
 
@@ -399,6 +455,9 @@ def planificar(texto: str, sesion) -> dict:
         "ultimo_mensaje_de_ruta": (sesion.historial[-1]["texto"][:300]
                                    if sesion.historial else None),
         "ruta_ofrecio_contacto_humano": sesion.oferta_contacto,
+        # Cuántas veces se acompañó sin llegar a un motivo. Si ya son varias, toca
+        # ofrecer algo concreto aunque el estudiante siga sin ponerle nombre.
+        "exploraciones_previas": getattr(sesion, "exploradas", 0),
     }
     try:
         r = invocar_json(f"ESTADO: {json.dumps(estado, ensure_ascii=False)}\nMENSAJE: {texto}",
@@ -441,12 +500,23 @@ CÓMO RESPONDES
 - Si es el primer turno, preséntate en una frase como asistente de IA de orientación.
 - Tono cálido, cercano y concreto, en español neutro. Máximo 120 palabras. Valida lo que
   siente sin dramatizar ni sermonear.
+- Suena como una persona que conversa, no como un formulario: frases cortas y en primera
+  persona. Puedes usar uno o dos emojis si encajan con lo que dice (🤍 🙂 🌿 📅), nunca más
+  ni en todas las frases.
 - Según la ACCIÓN:
   · orientar: reconoce lo que cuenta, explica en una frase qué tipo de apoyo calza y muestra
     las opciones numeradas EXACTAMENTE como vienen (número, día, fecha, hora, servicio, canal).
     Si una opción es de pares (es_puente_pares=true), explica que es un primer contacto con
     estudiantes formados mientras se coordina orientación. Cierra pidiendo que elija un número
     o diga si ninguna le sirve.
+  · explorar: el estudiante no sabe qué le pasa. NO propongas ninguna cita todavía y NO le
+    pongas una etiqueta clínica. Haz UNA sola pregunta abierta que lo ayude a ponerle nombre,
+    y menciona en pocas palabras dos o tres cosas que suelen aparecer (por ejemplo: "me cuesta
+    dormir", "siento que no me alcanza el tiempo", "me siento solo/a en la U", "no sé qué haré
+    cuando termine la carrera") para que elija o lo diga con sus palabras. Cierra dejándole la
+    puerta abierta: no hace falta que lo tenga claro, y tampoco tiene que contar todo.
+    Si RESULTADOS trae "proponer_opciones" (porque ya se acompañó lo suficiente), entonces sí
+    muestra las opciones y dile que no necesita haberle puesto un nombre al problema.
   · informar: responde con el contexto y ofrece buscar una cita si le sirve.
   · reservar: confirma día, hora, servicio, canal y recordatorios; recuerda que puede reprogramar.
   · replanificar: muestra las nuevas opciones numeradas.

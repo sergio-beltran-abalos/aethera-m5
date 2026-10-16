@@ -128,6 +128,56 @@ ok(s.opciones or s.reserva is None, "estado de sesión consistente")
 ok(len(s.historial) % 2 == 0, "historial con pares estudiante/ruta")
 
 print("\n" + "=" * 72)
+print(" 7 bis · ACOMPAÑAR SIN MOTIVO: no derivar cuando no se entiende")
+print("=" * 72)
+from aethera import ia as ia_mod  # noqa: E402
+
+_clave_orig = ia_mod.obtener_clave
+ia_mod.obtener_clave = lambda: None          # fuerza el camino de reglas de respaldo
+try:
+    # Sobre estos mensajes el clasificador devuelve confianzas de 0,2–0,5 y acierta
+    # por azar ("ando bajoneado" → presión académica). Por eso Ruta pregunta en vez
+    # de derivar: mandarlo a un servicio que no le toca es peor que preguntar.
+    for vago in ["no sé cómo me siento", "no sé qué me pasa", "ando raro", "estoy mal",
+                 "no sé explicarlo", "no tengo idea de lo que me pasa", "nada"]:
+        ok(ia_mod.es_vago(vago), f"«{vago}» no alcanza para clasificar")
+
+    s_v = agente.Sesion(tarjetas_demo()[list(tarjetas_demo())[0]], "V",
+                        servicios.Agenda(desde=C.FECHA_DEMO))
+    for turno in (1, 2):
+        respuesta, traza = agente.procesar_mensaje(s_v, "no sé cómo me siento")
+        ok(traza["accion"] == "explorar" and not s_v.opciones,
+           f"turno {turno}: Ruta acompaña y no propone citas ({len(respuesta)} chars)")
+    ok("dormir" in respuesta.lower() and "?" in respuesta,
+       "la respuesta invita a seguir hablando, con opciones para reconocerse")
+
+    _, traza = agente.procesar_mensaje(s_v, "no sé cómo me siento")
+    ok(traza["accion"] == "explorar" and bool(s_v.opciones),
+       f"tras acompañar lo suficiente ofrece {len(s_v.opciones)} espacio(s)")
+    ok(s_v.motivo == agente.MOTIVO_SIN_NOMBRE,
+       f"el motivo ofrecido no exige diagnóstico: {s_v.motivo}")
+
+    # Un motivo claro sí deriva de inmediato: acompañar no es no responder.
+    s_d = agente.Sesion(tarjetas_demo()[list(tarjetas_demo())[0]], "D",
+                        servicios.Agenda(desde=C.FECHA_DEMO))
+    _, t_d = agente.procesar_mensaje(s_d, "tengo muchas entregas y casi no duermo")
+    ok(t_d["accion"] == "orientar" and bool(s_d.opciones),
+       "una dificultad clara sí deriva a servicios")
+
+    # Decir "sí" a lo que Ruta ofreció no reclasifica: se muestra lo ya propuesto.
+    s_o = agente.Sesion(tarjetas_demo()[list(tarjetas_demo())[0]], "O",
+                        servicios.Agenda(desde=C.FECHA_DEMO))
+    s_o.consentimiento_pulse = True
+    s_o.mood_track = pulso.historial_ejemplo("O")
+    agente.ofrecer_proactivamente(s_o)
+    previas = [o["slot_id"] for o in s_o.opciones]
+    _, t_o = agente.procesar_mensaje(s_o, "sí")
+    ok(t_o["accion"] == "orientar" and [o["slot_id"] for o in s_o.opciones] == previas,
+       "un «sí» reutiliza la propuesta vigente y no la recalcula")
+finally:
+    ia_mod.obtener_clave = _clave_orig
+
+print("\n" + "=" * 72)
 print(" 8 · PULSE: consentimiento y ARCO")
 print("=" * 72)
 s2 = agente.Sesion(tarjetas_demo()[list(tarjetas_demo())[0]], "A")
@@ -222,8 +272,15 @@ if oferta:
     ok(oferta["tipo"] in ("patron", "evento"), f"disparador activado: {oferta['tipo']}")
     ok(msg.startswith("Soy Ruta") or "Te escribo" in msg,
        "el mensaje declara que la iniciativa es de Ruta")
-    ok("si no, seguimos sin cita" in msg, "el mensaje deja rechazarla sin costo")
+    ok("Nada de esto es obligatorio" in msg, "el mensaje deja rechazarla sin costo")
+    ok("Responde con el número" not in msg and "muéstrame las citas" in msg,
+       "la sugerencia anuncia las citas; no las vuelca")
     ok(len(s_pa.opciones) > 0, f"ofrece {len(s_pa.opciones)} turno(s) concreto(s)")
+    # Segunda puerta: quien pide verlas, las ve.
+    antes = len(s_pa.opciones)
+    texto_citas, _ = agente.mostrar_citas(s_pa)
+    ok("Responde con el número" in texto_citas and len(s_pa.opciones) == antes,
+       "al pedirlas se muestran y no se recalculan")
 
 msg2, _ = agente.ofrecer_proactivamente(s_pa)
 ok(msg2 is None, "no insiste: el mismo disparador no se repite en la sesión")
