@@ -34,9 +34,8 @@ PROVEEDOR = os.getenv("AETHERA_PROVEEDOR", "gemini").lower()
 
 # Los IDs por defecto se pueden sobrescribir con AETHERA_MODELO sin tocar código.
 MODELOS_POR_DEFECTO = {
-    # Verificado contra la API: gemini-2.5-flash-lite devuelve 404 para cuentas
-    # nuevas. Si tu cuenta lo acepta, puedes forzarlo con AETHERA_MODELO.
-    "gemini": "gemini-3.5-flash-lite",
+    # gemini-3.5-flash activo y con cuota disponible en la capa gratuita
+    "gemini": "gemini-3.5-flash",
     "openai": "gpt-5.6-luna",
     "huggingface": "meta-llama/Llama-3.3-70B-Instruct",
     "compatible": "TU_MODELO",

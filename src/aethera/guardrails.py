@@ -122,12 +122,13 @@ def validar_salida(texto: str, opciones_validas=()) -> list[str]:
             if not re.search(r"\bno\b|\bni\b|\bsin\b", previo):
                 problemas.append(f"lenguaje clínico: '{m.group(0)}'")
 
-    nombres_validos = set(__import__("aethera.datos", fromlist=["x"]).servicios()["name"])
+    from . import datos
+    nombres_validos = set(datos.servicios()["name"])
     for nombre in re.findall(r"Espacio [A-ZÁÉÍÓÚÑ][\wáéíóúñ]+ [A-ZÁÉÍÓÚÑ][\wáéíóúñ]+", texto):
         if nombre not in nombres_validos:
             problemas.append(f"servicio inexistente: '{nombre}'")
 
-    sids = set(__import__("aethera.datos", fromlist=["x"]).servicios()["service_id"])
+    sids = set(datos.servicios()["service_id"])
     for sid in re.findall(r"SRV_AE_\d{3}", texto):
         if sid not in sids:
             problemas.append(f"service_id inexistente: {sid}")

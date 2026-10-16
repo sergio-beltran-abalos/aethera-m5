@@ -51,9 +51,15 @@ def _gemini(mensaje: str, instr: str, max_tokens: int, temperatura: float, json_
     if not clave:
         raise LLMNoDisponible(f"Falta {C.clave_api()} en el entorno.")
     cliente = genai.Client(api_key=clave)
-    config = types.GenerateContentConfig(
-        system_instruction=instr, temperature=temperatura, max_output_tokens=max_tokens,
-        response_mime_type="application/json" if json_mode else "text/plain")
+    try:
+        config = types.GenerateContentConfig(
+            system_instruction=instr, temperature=temperatura, max_output_tokens=max_tokens,
+            response_mime_type="application/json" if json_mode else "text/plain",
+            thinking_config=types.ThinkingConfig(thinking_budget=0))
+    except Exception:
+        config = types.GenerateContentConfig(
+            system_instruction=instr, temperature=temperatura, max_output_tokens=max_tokens,
+            response_mime_type="application/json" if json_mode else "text/plain")
 
     for intento, espera in enumerate([2, 4, 8], start=1):
         try:
@@ -207,25 +213,22 @@ CONTEXTO = construir_contexto()
 # ─────────────────────────────────────────────────────────────────────────────
 # 1 · Clasificador
 # ─────────────────────────────────────────────────────────────────────────────
-# Último recurso: palabras clave. Solo se usa si tampoco hay clasificador
-# entrenado. La versión anterior de la app se apoyaba solo aquí y acertaba 27 %,
-# peor que la clase mayoritaria (20,6 %): era una falsa red de seguridad.
+# Palabras clave para intención explícita y fallback sin LLM.
 PALABRAS_MOTIVO = {
     "social_support": ["solo", "sola", "amig", "nadie", "aislad", "conocer gente", "companer",
                        "lejos de mi familia", "soledad", "encajar", "no tengo con quien", "extrano",
-                       "mude", "migr"],
-    "career_concern": ["practica", "empleo", "cv", "curriculum", "egres", "futuro laboral",
+                       "mude", "migr", "otros estudiantes", "actividad con"],
+    "career_concern": ["practica", "practicas", "empleo", "cv", "curriculum", "egres", "futuro laboral",
                        "entrevista", "linkedin", "chamba", "trabajo cuando termine",
-                       "carrera profesional", "conseguir trabajo", "pasantia"],
-    "sleep_and_routine": ["dorm", "sueno", "insomnio", "desvel", "cansad", "rutina", "organiz",
+                       "carrera profesional", "conseguir trabajo", "pasantia", "carrera"],
+    "sleep_and_routine": ["dorm", "duermo", "sueno", "insomnio", "desvel", "cansad", "rutina", "organiz",
                            "agotad", "energia", "no descanso", "horario", "madrug", "tiempo"],
     "preventive_guidance": ["que servicios", "informacion", "prevenir", "por si acaso", "taller",
                            "como funciona", "que apoyos", "que hay", "conocer los servicios",
                            "orientacion general"],
     "academic_pressure": ["examen", "evaluacion", "parcial", "final", "nota", "curso", "tarea",
-                          "entrega", "estudi", "jalar", "desaprob", "carga", "sobrepasad",
-                          "rendimiento", "clase", "universidad no", "no avanzo",
-                          "no me alcanza el tiempo para estudiar"],
+                          "entrega", "estudiar", "estudios", "estudio", "jalar", "desaprob", "carga", "sobrepasad",
+                          "rendimiento", "clase", "no avanzo", "no me alcanza el tiempo para estudiar"],
 }
 
 INSTR_CLASIFICADOR = f"""
@@ -249,7 +252,21 @@ Devuelve SOLO JSON: {{"reason_code": "<código>", "confianza": <0 a 1>,
 
 
 def clasificar_por_reglas(texto: str) -> tuple[str, float]:
-    """Respaldo en dos peldaños: clasificador entrenado sobre D5, y si falla, palabras."""
+    """
+    Respaldo híbrido:
+    1. Si hay palabras clave explícitas con señal clara, se prioriza el motivo detectado.
+    2. Si no hay señal clara o hay empate, se recurre al clasificador entrenado sobre D5.
+    3. Si falla, orientación preventiva como salida segura.
+    """
+    t = normalizar(texto)
+    puntos = {m: sum(1 for p in pals if p in t) for m, pals in PALABRAS_MOTIVO.items()}
+    ordenados = sorted(puntos.items(), key=lambda x: x[1], reverse=True)
+    mejor_m, mejor_p = ordenados[0]
+    segundo_p = ordenados[1][1]
+
+    if mejor_p > 0 and mejor_p > segundo_p:
+        return mejor_m, round(min(0.85, 0.5 + mejor_p * 0.15), 2)
+
     try:
         from .ml import clasificar_texto
         motivo, conf = clasificar_texto(texto)
@@ -257,17 +274,14 @@ def clasificar_por_reglas(texto: str) -> tuple[str, float]:
     except Exception:  # noqa: BLE001 - último recurso, nunca debe romper el turno
         pass
 
-    t = normalizar(texto)
-    puntos = {m: sum(1 for p in pals if p in t) for m, pals in PALABRAS_MOTIVO.items()}
-    mejor = max(puntos, key=puntos.get)
-    if puntos[mejor] == 0:
-        return "preventive_guidance", 0.3
-    return mejor, round(puntos[mejor] / sum(puntos.values()), 2)
+    if mejor_p > 0:
+        return mejor_m, 0.5
+    return "preventive_guidance", 0.3
 
 
 def clasificar(texto: str) -> dict:
     try:
-        r = invocar_json(f"Mensaje del estudiante:\n{texto}", INSTR_CLASIFICADOR, max_tokens=150)
+        r = invocar_json(f"Mensaje del estudiante:\n{texto}", INSTR_CLASIFICADOR, max_tokens=400)
         codigo = r.get("reason_code")
         if codigo not in C.MOTIVOS:
             raise LLMNoDisponible(f"Código inválido: {codigo}")
@@ -277,7 +291,7 @@ def clasificar(texto: str) -> dict:
     except LLMNoDisponible as e:
         codigo, conf = clasificar_por_reglas(texto)
         return {"reason_code": codigo, "etiqueta": C.MOTIVOS[codigo], "confianza": conf,
-                "resumen": "", "metodo": "clasificador D5 (sin LLM)", "detalle": str(e)[:120]}
+                "resumen": "", "metodo": "clasificador de respaldo (sin LLM)", "detalle": str(e)[:120]}
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -461,7 +475,7 @@ def planificar(texto: str, sesion) -> dict:
     }
     try:
         r = invocar_json(f"ESTADO: {json.dumps(estado, ensure_ascii=False)}\nMENSAJE: {texto}",
-                         INSTR_PLANIFICADOR, max_tokens=250)
+                         INSTR_PLANIFICADOR, max_tokens=400)
         if r.get("accion") not in ACCIONES:
             raise LLMNoDisponible("Acción inválida")
         if r["accion"] == "reservar" and not sesion.opciones:
