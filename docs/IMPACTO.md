@@ -99,9 +99,10 @@ Un −3,2 pp puede parecer poco. Tres razones por las que lo declaramos bajo:
 Preferimos un número defendible a uno grande. El discurso útil para el Demo Day es:
 
 > «No prometemos cerrar la brecha del 68 %. Medimos que el estudiante tiene 370 turnos
-> delante y 0 viables, y que Ruta le entrega el primero que sí. Si eso mueve el indicador
-> 3 puntos con supuestos conservador, la implementación real puede moverlo más; si mueve
-> menos, lo vamos a poder ver.»
+> delante, de los cuales solo el 28 % le sirve, y que uno de cada ocho no tiene ninguno
+> viable aunque mire la pantalla entera. Ruta le entrega el primero que sí. Si eso mueve el
+> indicador 3 puntos con supuestos conservadores, la implementación real puede moverlo más;
+> si mueve menos, lo vamos a poder ver.»
 
 ## 6. Qué medirían los KPIs de la app
 

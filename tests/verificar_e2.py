@@ -177,6 +177,19 @@ ok(abs(b["fraccion_turnos_compatibles"] - 0.282) < 0.05,
    f"fracción compatible = {b['fraccion_turnos_compatibles']:.1%} (README: 28,2 %)")
 ok(b["ruta_match_rate"] == 1.0, f"Match Rate de Ruta = {b['ruta_match_rate']:.0%}")
 
+# La mediana de turnos viables es un CONTEO, no una proporcion. Se verifican
+# ambos por separado porque confundirlos fue exactamente el error que llevo
+# corregido: la proporcion (0,28) leida como conteo daba "mediana 0 viables",
+# que es falso.
+ok(b["mediana_turnos_viables"] > 50,
+   f"mediana de turnos VIABLES = {b['mediana_turnos_viables']:.0f} (es un conteo)")
+ok(abs(b["proporcion_mediana_compatible"] - 0.277) < 0.05,
+   f"proporción compatible mediana = {b['proporcion_mediana_compatible']:.1%} (es una razón)")
+ok(0.05 < b["sin_turno_viable"] < 0.25,
+   f"estudiantes sin ningún turno viable = {b['sin_turno_viable']:.1%}")
+ok(b["ruta_con_opcion"] / b["n"] > 0.95,
+   f"Ruta encuentra turno para {b['ruta_con_opcion']}/{b['n']} estudiantes")
+
 p = ev.proyectar_impacto()
 ok(p["m5_pct_proyectado"] < p["m5_pct_base"],
    f"la proyección BAJA el indicador: {p['m5_pct_base']:.1%} → {p['m5_pct_proyectado']:.1%}")

@@ -217,7 +217,7 @@ evaluación observe exactamente lo que observó el equipo autor.
 Ocho suites, todas ejecutables sin clave de API y sin conexión:
 
 ```bash
-python tests/verificar_e2.py        # 78 comprobaciones de extremo a extremo
+python tests/verificar_e2.py        # 82 comprobaciones de extremo a extremo
 python tests/verificar_handlers.py  # cada handler de la interfaz, con entradas reales
 python tests/verificar_ui.py        # la aplicación Gradio construye sin errores
 python tests/revisar_html.py        # todas las vistas generan HTML bien formado

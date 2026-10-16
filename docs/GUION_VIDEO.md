@@ -32,7 +32,7 @@ un bloque de la estructura.
 | 1 · Diagnóstico | 0:00 – 0:40 | Indicador de la misión y su causa más probable | 68,2 % · 62 % fuera de horario · 50 % nocturno |
 | 2 · Población | 0:40 – 1:05 | Segmento prioritario y caso representativo | 826 estudiantes · agenda del perfil |
 | 3 · Funcionamiento | 1:05 – 2:35 | Ejecución del prototipo de punta a punta | Consentimiento, registro de ánimo, propuesta, reserva, cita con título neutro |
-| 4 · Resultados | 2:35 – 3:10 | Evaluación offline y proyección sobre el indicador | 370 turnos · mediana 0 viables · 68,2 % → 65,0 % |
+| 4 · Resultados | 2:35 – 3:10 | Evaluación offline y proyección sobre el indicador | 370 turnos · 12,7 % sin ninguno viable · 68,2 % → 65,0 % |
 | 5 · Alcance y límites | 3:10 – 3:45 | Supervisión humana y límites del modelo | Protocolo de crisis · AUC declarada |
 | 6 · Cierre | 3:45 – 4:00 | Encuadre del alcance del producto | — |
 

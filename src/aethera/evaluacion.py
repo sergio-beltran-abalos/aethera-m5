@@ -129,6 +129,7 @@ def comparar_ruta_directorio(n: int = N_EVALUACION) -> dict:
     dir_con_alguno = 0
     turnos_totales = turnos_compatibles = 0
     ratios: list[float] = []
+    viables: list[int] = []          # conteo real, no proporcion
     dias_buscados: list[int] = []
     hoy = pd.Timestamp(C.FECHA_DEMO).date()
 
@@ -149,6 +150,7 @@ def comparar_ruta_directorio(n: int = N_EVALUACION) -> dict:
         turnos_compatibles += len(compatibles)
         if len(oferta):
             ratios.append(len(compatibles) / len(oferta))
+        viables.append(len(compatibles))
         if compatibles:
             dir_con_alguno += 1
 
@@ -167,6 +169,7 @@ def comparar_ruta_directorio(n: int = N_EVALUACION) -> dict:
 
     n = len(universo)
     ratios.sort()
+    viables.sort()
     return {
         "n": n,
         "ruta_match_rate": ruta_ok / ruta_total if ruta_total else 0.0,
@@ -174,7 +177,13 @@ def comparar_ruta_directorio(n: int = N_EVALUACION) -> dict:
         "directorio_con_alguno_turno_util": dir_con_alguno / n if n else 0.0,
         "turnos_promedio_por_estudiante": turnos_totales / n if n else 0.0,
         "fraccion_turnos_compatibles": turnos_compatibles / turnos_totales if turnos_totales else 0.0,
-        "mediana_turnos_compatibles_por_estudiante": ratios[len(ratios) // 2] if ratios else 0.0,
+        # Proporcion de turnos compatibles: NO es un conteo. Se llama proporcion
+        # para que no pueda confundirse con una cantidad de turnos.
+        "proporcion_mediana_compatible": ratios[len(ratios) // 2] if ratios else 0.0,
+        # Conteo real de turnos viables por estudiante del directorio.
+        "mediana_turnos_viables": viables[len(viables) // 2] if viables else 0,
+        "sin_turno_viable": (sum(1 for v in viables if v == 0) / len(viables)
+                              if viables else 0.0),
         "dias_hasta_primera_opcion": (sum(dias_buscados) / len(dias_buscados)
                                       if dias_buscados else 0.0),
         "nota": ("El 100 % de Ruta es por construccion: filtrar la agenda ES el producto. "
@@ -275,8 +284,11 @@ if __name__ == "__main__":  # pragma: no cover
     print(f"  Match Rate de Ruta                {b['ruta_match_rate']:.1%}")
     print(f"  Turnos que el directorio muestra   {b['turnos_promedio_por_estudiante']:.0f} por estudiante")
     print(f"  De esos, compatibles               {b['fraccion_turnos_compatibles']:.1%}")
-    print(f"  Mediana de turnos viables          {b['mediana_turnos_compatibles_por_estudiante']:.0f}")
-    print(f"  Estudiantes con AL MENOS 1 turno   {b['directorio_con_alguno_turno_util']:.1%} viable")
+    print(f"  Proporcion compatible (mediana)    {b['proporcion_mediana_compatible']:.1%}")
+    print(f"  Turnos VIABLES (mediana)           {b['mediana_turnos_viables']:.0f}")
+    print(f"  Estudiantes con CERO turno viable   {b['sin_turno_viable']:.1%}")
+    print(f"  Ruta encuentra al menos uno         "
+          f"{b['ruta_con_opcion'] / b['n']:.1%}")
     print(f"  Primera opcion de Ruta a           {b['dias_hasta_primera_opcion']:.1f} dias")
     print(f"\n  {b['nota']}")
 

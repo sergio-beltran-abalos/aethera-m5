@@ -28,7 +28,7 @@ segunda oleada, y ahí apareció la causa concreta de la fricción.
 |---|---|---|---|
 | 1 | **Se pide ayuda a cualquier hora** | 62 % de las conversaciones de D5 empiezan fuera de lun–vie 09:00–18:00; **50 % llegan de noche** | Ruta atiende por chat siempre, y propone citas dentro de horarios reales: pares hasta las 20:00 y también sábados |
 | 2 | **La derivación actual no depende del motivo** | solo **34,2 %** de las derivaciones de D5 apuntan al tipo de servicio que D2 asocia a ese motivo (azar = 33,3 %) | El mapa motivo → servicio se toma de **D2**, nunca de D5 |
-| 3 | **El directorio muestra turnos que el estudiante no puede usar** | 370 turnos por estudiante en 14 días; solo **28,2 %** compatibles con su horario; **mediana 0 viables** | El núcleo del producto: un solver que cruza agenda, servicios y distancia |
+| 3 | **El directorio muestra turnos que el estudiante no puede usar** | 370 turnos por estudiante en 14 días; solo **28,2 %** compatibles; **mediana 102 viables** y **12,7 % del segmento sin ninguno** | El núcleo del producto: un solver que cruza agenda, servicios y distancia |
 
 El hallazgo 3 es el que define la solución. No es un problema de falta de información:
 es que **la información existe, pero está enterrada bajo 370 opciones y ninguna cabe
@@ -295,7 +295,7 @@ Detalle en `docs/COSTOS.md`.
 python -m aethera.segmentos      # embudo M5
 python -m aethera.ml             # modelos, AUC, límite del rango
 python -m aethera.evaluacion     # los tres experimentos + sensibilidad
-python tests/verificar_e2.py     # 78 comprobaciones de extremo a extremo
+python tests/verificar_e2.py     # 82 comprobaciones de extremo a extremo
 ```
 
 La agenda usa una semilla fija: la demo produce **exactamente los mismos números** en cada
