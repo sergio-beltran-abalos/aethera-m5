@@ -69,7 +69,7 @@ solución debe resolver.
 | Paso | Acción | Evidencia |
 |---|---|---|
 | 3.1 | Activación del consentimiento y registro del estado de ánimo | La interfaz rechaza el registro sin consentimiento previo |
-| 3.2 | Ruta escribe primero: registra los días difíciles de la semana y ofrece un espacio sin que se le pregunte | El turno aparece en el chat con la marca de que la iniciativa es de Ruta |
+| 3.2 | Ruta escribe primero: registra los días difíciles de la semana y ofrece un espacio sin que se le pregunte | Aparece la tarjeta «Ruta tiene una sugerencia» en Pulse, y su propuesta queda esperando en el chat de Ruta |
 | 3.3 | Selección y confirmación de una cita | Código de reserva y recordatorios programados |
 | 3.4 | Apertura de «Privacidad de la cita» y elección del estilo neutro | La tabla de reservas muestra «Cita campus» en la columna del calendario |
 

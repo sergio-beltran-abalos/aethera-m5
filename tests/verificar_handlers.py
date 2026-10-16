@@ -7,7 +7,7 @@ os.environ["AETHERA_PROVEEDOR"] = "gemini"
 for k in ("GEMINI_API_KEY", "AETHERA_CLAVE_API"):
     os.environ.pop(k, None)
 
-from aethera import agente, config as C, servicios, ui  # noqa: E402
+from aethera import agente, config as C, pulso, servicios, ui  # noqa: E402
 from aethera.segmentos import tarjetas_demo  # noqa: E402
 
 fallos = []
@@ -46,23 +46,47 @@ print(f"    chat={len(chat)} turno | aviso={len(aviso)} chars | boton visible={b
 if chat:
     print(f"    ultimo turno: {str(chat[-1]['content'])[:60]}")
 
-# 4. el chat recibio la oferta proactiva
+# 4. el registro dejo la sugerencia en el chat
 if not any(m["role"] == "assistant" for m in chat):
     fallos.append("el registro no produjo turno de Ruta")
-    print("  x no hubo turno proactivo tras registrar")
+    print("  x no hubo sugerencia tras registrar")
 else:
-    print("  . Ruta escribio primero OK")
+    print("  . Ruta dejo una sugerencia al registrar OK")
 
 # 4b. y ademas se muestra en la pestana donde esta el estudiante
-if "Ruta te escribió primero" not in (aviso or ""):
-    fallos.append("la oferta no se muestra en la pestana Pulse")
-    print("  x el aviso de la oferta no aparece en Pulse")
+if "Ruta tiene una sugerencia" not in (aviso or ""):
+    fallos.append("la sugerencia no se muestra en la pestana Pulse")
+    print("  x la tarjeta de sugerencia no aparece en Pulse")
 else:
-    print("  . la oferta se ve sin cambiar de pestana OK")
+    print("  . la sugerencia se ve sin cambiar de pestana OK")
+
+# 4c. la tarjeta no arrastra el volcado entero de la conversacion
+if "Responde con el número" in (aviso or ""):
+    fallos.append("la tarjeta de la sugerencia vuelca la conversacion entera")
+    print("  x la tarjeta repite el texto del chat")
+else:
+    print("  . la tarjeta resume y deja el detalle en la conversacion OK")
+
+# 4d. el boton de hablar no adelanta propuestas: la iniciativa es del estudiante
+fresca = agente.Sesion(tarjetas_demo()[nombre], nombre, servicios.Agenda(desde=C.FECHA_DEMO))
+fresca.consentimiento_pulse = True
+fresca.mood_track = pulso.historial_ejemplo(nombre)
+r5 = check("_abrir_chat (sin adelantar la oferta)", ui._abrir_chat(fresca, [], "neutro"), 5)
+if (r5[3] or "") != "":
+    fallos.append("Hablar con Ruta volvio a mostrar la oferta proactiva")
+    print("  x el boton vuelve a sacar la tarjeta de la sugerencia")
+elif fresca.disparadores_vistos:
+    fallos.append("Hablar con Ruta consumio un disparador")
+    print("  x el boton consumio el disparador")
+elif not r5[0]:
+    fallos.append("Hablar con Ruta no dejo la conversacion lista para escribir")
+    print("  x el chat se queda vacio")
+else:
+    print("  . Hablar con Ruta abre la conversacion sin adelantar la propuesta OK")
 
 # 5. abrir chat con estilo distinto
 r = check("_abrir_chat", ui._abrir_chat(sesion, chat, "servicio"), 5)
-print(f"    estilo ahora = {sesion.estilo_evento} | aviso={len(r[3])} chars")
+print(f"    estilo ahora = {sesion.estilo_evento} | aviso={len(r[3] or '')} chars")
 
 # 6. enviar un mensaje
 r = check("_enviar", ui._enviar("tengo muchas entregas y no duermo", sesion, chat), 6)

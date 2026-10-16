@@ -90,7 +90,7 @@ El feature más importante del modelo de asistencia es `espera_dias` (+0,053 AUC
 asistencia cae de **75,3 %** en el cuartil de menor espera a **63,7 %** en el de mayor
 espera. Coincide con el diagnóstico del Entregable 1.
 
-### El respaldo sin IA no es un joke
+### El respaldo sin IA no es un adorno
 
 Cada llamada al modelo tiene doble respaldo. Sin clave de API, la app funciona completa:
 el clasificador de D5 sustituye al LLM y las plantillas de respaldo sustituyen al
@@ -221,7 +221,7 @@ final, sino la condición de existencia del producto.
 
 ---
 
-## 7 bis. Las dos decisiones de producto queisit defienden el estigma
+## 7 bis. Las dos decisiones de producto frente al estigma
 
 El módulo `disparadores.py` y el estilo de evento en `agente.py` son, juntos, la
 respuesta operativa a la misión M5. El diagnóstico del Entregable 1 atribuyó la baja
@@ -239,14 +239,17 @@ hable de su salud mental:
   universidad tiene más espacio para acompañar a quien lo necesite, así que te busco un
   apoyo con esa fecha en mente.»*
 - **Patrón propio.** Si el propio estudiante registró tres o más días difíciles en una
-  semana, Ruta lo señala sin diagnostics: *«No hace falta que sepas explicarme qué te
+  semana, Ruta lo señala sin diagnosticar: *«No hace falta que sepas explicarme qué te
   pasa: puedo buscarte un espacio.»*
 
-Tres límites que el código impone y las pruebas verifican:
+Cuatro límites que el código impone y las pruebas verifican:
 
 - **Sin consentimiento de Pulse, no hay iniciativa.** Un sistema proactivo que no tiene
   permiso previo se convierte en vigilancia.
 - **No insiste.** Cada disparador actúa una vez por sesión.
+- **No reemplaza la iniciativa del estudiante.** El botón «Hablar con Ruta» abre la
+  conversación y deja escribir; la sugerencia llega como tarjeta y solo cuando hay un
+  motivo. Ruta no adelanta una propuesta a quien ya decidió hablar.
 - **El evento es común a todos.** Se lee del calendario institucional, que no se
   segmenta por perfil: un aviso distinto según el estado de ánimo de cada quien sería
   precisamente la señal que este producto no debe producir.
@@ -289,7 +292,7 @@ calendario despliega esto sin tocar el núcleo.
 ~13 M tokens/mes, dentro del nivel gratuito del proveedor y de un Space gratuito.
 Detalle en `docs/COSTOS.md`.
 
-## 8. Cómo reproducir los números
+## 9. Cómo reproducir los números
 
 ```bash
 python -m aethera.segmentos      # embudo M5

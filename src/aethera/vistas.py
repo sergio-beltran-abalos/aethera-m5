@@ -13,6 +13,7 @@ Es una pieza de universidad tranquila. Tres superficies con reglas distintas:
 """
 from __future__ import annotations
 
+import re
 from datetime import timedelta
 
 from . import agente, calendario, config as C, datos, horarios, pulso, servicios
@@ -419,27 +420,54 @@ def html_panel_traza(sesion) -> str:
     return "\n".join(L)
 
 
-def html_oferta_ruta(mensaje: str | None) -> str:
-    """
-    Aviso de que Ruta escribió primero, mostrado en la pestaña donde el
-    estudiante está.
+_NEGRITA = re.compile(r"\*\*(.+?)\*\*", re.S)
 
-    Sin esto, la oferta se registra en el chat de otra pestaña y el estudiante
-    no llega a verla: la iniciativa existe pero no se percibe, que es lo
-    mismo que no tenerla.
+
+def _texto_html(texto: str) -> str:
     """
-    if not mensaje:
+    Negritas y saltos de línea para un bloque HTML.
+
+    Las ofertas escriben con **negritas**; sin esta conversión el estudiante
+    vería los asteriscos. El resto se escapa para que ningún dato pueda inyectar
+    marcado.
+    """
+    limpio = texto.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+    limpio = _NEGRITA.sub(r"<strong>\1</strong>", limpio)
+    return limpio.replace("\n", "<br>")
+
+
+def html_oferta_ruta(oferta: dict | None, n_opciones: int = 0) -> str:
+    """
+    Sugerencia que Ruta deja cuando el momento la justifica.
+
+    Se muestra en la pestaña donde está el estudiante porque la propuesta se
+    registra en el chat de Ruta: sin este aviso, la iniciativa existe pero no se
+    percibe, que es lo mismo que no tenerla.
+
+    El encabezado la presenta como sugerencia y no como aviso, y el detalle de
+    las opciones se queda en la conversación: la tarjeta solo explica por qué
+    Ruta escribió y ofrece ir a verla.
+    """
+    if not oferta:
         return ""
-    cuerpo = (mensaje.split("\n\n", 1)[-1]
-              if mensaje.startswith("Soy Ruta") else mensaje)
+    frase = _texto_html((oferta.get("frase") or "").strip())
+    pie = (f"Te propone <b>{n_opciones} espacios</b> que no chocan con tus clases "
+           f"ni con tu trabajo."
+           if n_opciones else "Tienes una propuesta esperando en la conversación.")
     return f"""
-    <div style="margin-top:14px;border:1px solid {PETROLEO};border-left:4px solid {PETROLEO};
-                border-radius:10px;background:#F0F9F9;padding:14px 16px">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-        <span style="font-size:11px;font-weight:700;letter-spacing:.6px;
-                     text-transform:uppercase;color:{PETROLEO}">Ruta te escribió primero</span>
+    <div style="margin-top:16px;border:1px solid #CFE7EA;border-radius:14px;
+                background:linear-gradient(180deg,#F1FAFA 0%,#FFFFFF 74%);
+                box-shadow:0 1px 2px rgba(20,33,61,.05),0 4px 16px rgba(20,33,61,.06);
+                overflow:hidden">
+      <div style="display:flex;align-items:center;gap:9px;padding:13px 16px 0">
+        <span style="font-size:16px;line-height:1">🗓️</span>
+        <span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;
+                     font-size:13.5px;color:{PETROLEO_OSC}">Ruta tiene una sugerencia</span>
       </div>
-      <div style="font-size:13.5px;line-height:1.55;color:{TINTA};white-space:pre-wrap">{cuerpo}</div>
+      <div style="padding:7px 16px 13px;font-size:13.5px;line-height:1.62;
+                  color:{TINTA}">{frase}</div>
+      <div style="border-top:1px solid #E4F2F3;background:#F7FCFC;padding:9px 16px;
+                  font-size:12.5px;color:{TEXTO_SUAVE}">{pie}</div>
     </div>"""
 
 

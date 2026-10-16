@@ -22,11 +22,13 @@ FORZAR_TEMA_CLARO = """() => {
 
 # Cambio de pestaña por JS en vez de por gr.Tabs: no depende de la version de
 # Gradio ni de su API interna de actualizacion, que ha cambiado varias veces.
-IR_A_RUTA_JS = """() => {
+# Devuelve las entradas sin tocarlas: el js de un evento REEMPLAZA lo que se
+# envia al backend, no lo amplía, asi que hay que devolverlas tal cual.
+IR_A_RUTA_JS = """(...args) => {
   const b = [...document.querySelectorAll('.tab-nav button, [role=tab]')]
             .find(x => /Ruta/.test(x.textContent || ''));
-  if (b) { b.click(); return 'ruta'; }
-  return 'no-encontrada';
+  if (b) b.click();
+  return args;
 }"""
 
 
@@ -98,46 +100,52 @@ def _registrar(id_mood: str, temas, nota: str, sesion, estilo_evento: str, chat)
     if resultado.get("crisis"):
         sesion.oferta_contacto = True
 
-    # Ruta puede escribir primero si el momento lo justifica.
-    mensaje, _ = _ofrecer(sesion, chat)
-    aviso = vistas.html_oferta_ruta(mensaje[-1]["content"] if mensaje else None)
+    # Ruta puede dejar una sugerencia si el momento la justifica: un patrón de
+    # días pesados propios o un evento institucional que se acerca.
+    chat, oferta = _ofrecer(sesion, chat)
+    aviso = vistas.html_oferta_ruta(oferta, len(sesion.opciones or []))
     return (vistas.html_frase(resultado), vistas.html_mood_track(sesion),
-            sesion, mensaje, aviso, gr.update(visible=bool(mensaje)))
+            sesion, chat, aviso, gr.update(visible=bool(oferta)))
 
 
 def _ofrecer(sesion, chat):
-    """Añade el turno proactivo al chat si corresponde. Devuelve (chat, sesion)."""
-    mensaje, _ = agente.ofrecer_proactivamente(sesion)
-    if not mensaje:
-        return chat, sesion
-    return (chat or []) + [{"role": "assistant", "content": mensaje}], sesion
+    """
+    Deja una sugerencia de Ruta en el chat si el momento la justifica.
+
+    Devuelve (chat, oferta). La oferta solo viene cuando de verdad se añadió un
+    turno: quien la muestre fuera de la conversación no debe repetir la anterior.
+    """
+    mensaje, oferta = agente.ofrecer_proactivamente(sesion)
+    if not oferta:
+        return chat, None
+    return (chat or []) + [{"role": "assistant", "content": mensaje}], oferta
 
 
 def _abrir_chat(sesion, chat, estilo_evento):
+    """
+    «Hablar con Ruta»: abre la conversación y saluda.
+
+    La iniciativa es del estudiante. Aquí Ruta no adelanta ninguna propuesta: si
+    el momento la justificaba, ya la dejó como sugerencia en Pulse y registrada
+    en el chat. Este botón solo abre la ventana para que el estudiante escriba.
+    """
     import gradio as gr
     if sesion is None:
         gr.Warning("Un momento: todavía se está preparando la sesión.")
         return chat, sesion, "", "", gr.update(visible=False)
     sesion.estilo_evento = estilo_evento or "neutro"
 
-    # Si hay un disparador pendiente se respeta ese turno: el estudiante no
-    # tiene por qué preguntar para que el sistema le ofrezca una cita.
-    chat, sesion = _ofrecer(sesion, chat)
-    if sesion.oferta_proactiva:
-        return (chat, sesion, vistas.html_panel_traza(sesion),
-                vistas.html_oferta_ruta(sesion.oferta_proactiva_frase()),
-                gr.update(visible=True))
-
-    if not any(e["fecha"] == C.FECHA_DEMO for e in sesion.mood_track):
-        aviso = (f'<div style="margin-top:14px;border:1px solid {vistas.BORDE};border-radius:10px;'
-                 f'padding:12px 14px;font-size:13px;color:{vistas.TEXTO_SUAVE};background:#FFFBEB">'
-                 f'Registra tu día en Pulse primero, o cuéntame directo en la pestaña Ruta.</div>')
-        return chat, sesion, vistas.html_panel_traza(sesion), aviso, gr.update(visible=False)
-
-    texto = pulso.abrir_chat(sesion)
-    aviso = vistas.html_oferta_ruta(texto)
-    return ((chat or []) + [{"role": "assistant", "content": texto}],
-            sesion, vistas.html_panel_traza(sesion), aviso, gr.update(visible=False))
+    # Se saluda una sola vez: la conversación la empieza quien escribe.
+    if not chat:
+        if any(e["fecha"] == C.FECHA_DEMO for e in sesion.mood_track):
+            texto = pulso.abrir_chat(sesion)
+        else:
+            texto = ("Cuéntame qué está pasando y busco un espacio que te sirva. "
+                     "Si registras tu día en Pulse primero, uso ese registro para "
+                     "afinar la propuesta.")
+        chat = [{"role": "assistant", "content": texto}]
+    return (chat, sesion, vistas.html_panel_traza(sesion), "",
+            gr.update(visible=False))
 
 
 
@@ -248,7 +256,7 @@ def construir():
                         # pestana y el estudiante no se enteraria: se muestra aqui
                         # y se ofrece el salto.
                         aviso_ruta = gr.HTML()
-                        btn_ir_ruta = gr.Button("💬  Ver la propuesta de Ruta",
+                        btn_ir_ruta = gr.Button("💬  Ver la propuesta en Ruta",
                                                 elem_id="btn-ir-ruta", visible=False)
 
                     with gr.Column(scale=6, elem_classes="panel"):
@@ -333,7 +341,8 @@ def construir():
         btn_registrar.click(_registrar, [mood, temas, nota, estado, estilo_evento, chat],
                             [frase, track, estado, chat, aviso_ruta, btn_ir_ruta])
         btn_hablar.click(_abrir_chat, [estado, chat, estilo_evento],
-                         [chat, estado, panel, aviso_ruta, btn_ir_ruta])
+                         [chat, estado, panel, aviso_ruta, btn_ir_ruta],
+                         js=IR_A_RUTA_JS)
         btn_ir_ruta.click(None, js=IR_A_RUTA_JS)
         btn_borrar.click(_borrar, [estado], [track, frase, estado, archivo])
         btn_descargar.click(_descargar, [estado], [archivo])
