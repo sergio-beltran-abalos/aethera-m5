@@ -52,9 +52,11 @@ ESTRUCTURA: 5 BLOQUES
 * **Qué dices en voz alta:**
   > «Hola a todos. En el Desafío Ciudad Aethera abordamos la **Misión M5**: la baja búsqueda de apoyo institucional en estudiantes universitarios con malestar emocional.
   >
-  > Al analizar los datos del Data Pack institucional, descubrimos una paradoja crítica: el **68,2 %** de los estudiantes con malestar moderado a alto en la universidad nunca ha consultado un servicio de bienestar. Y la causa principal no es falta de voluntad: en el dataset D2 las citas demoran en promedio **42 días**, y en el dataset D5 descubrimos que el **62 % de las consultas ocurren fuera del horario de oficina**, con un **50 % en horario nocturno**.
+  > Al analizar los datos del Data Pack institucional descubrimos una paradoja crítica: el **68,2 %** de los estudiantes con malestar moderado a alto en la universidad nunca ha consultado un servicio de bienestar. Y la causa principal no es falta de voluntad: en el dataset D2 las citas demoran en promedio **42 días**, y en el dataset D5 descubrimos que el **62 % de las consultas ocurren fuera del horario de oficina**, con un **50 % en horario nocturno**.
   >
-  > El sistema tradicional solo atiende de 9 a 5. Para un estudiante como nuestro Perfil B, que trabaja en el día y asiste a clases en la noche, el bienestar tradicional es incompatible con su vida. Para ellos creamos **Aethera Pulse + Ruta**.»
+  > **Aethera Pulse + Ruta** está pensado para **toda la comunidad universitaria** (diurnos, vespertinos, virtuales y presenciales). Sin embargo, para esta demostración elegimos el caso más exigente: nuestro Perfil B, un estudiante que trabaja a tiempo completo en el día y estudia en la noche. Si resolvemos la fricción para quien tiene el horario más ajustado, el sistema funciona para todos.
+  >
+  > Además, una ventaja clave es que la plataforma está **integrada directamente al ecosistema de la universidad**: se conecta con el calendario académico, la oferta de servicios y los horarios del campus, permitiendo un acceso inmediato y personalizado a los datos sin trámites engorrosos.»
 
 ---
 
@@ -107,7 +109,7 @@ ESTRUCTURA: 5 BLOQUES
   >
   > Cuando el estudiante expresa su necesidad real —por ejemplo, *"trabajo todo el día y me siento solo en la universidad"*—, el clasificador de IA identifica que se trata de **apoyo social** (`social_support`). En lugar de mandarlo a una consulta psicológica innecesaria, lo canaliza al servicio de **Acompañamiento entre pares**.
   >
-  > Y aquí está el núcleo de nuestra innovación: el **solver de restricciones**. Como sabe que este estudiante trabaja de día y estudia en la noche, descarta los turnos de oficina y le propone únicamente citas viables: sábados y tardes extendidas.
+  > Y aquí está el núcleo de nuestra innovación: al estar **integrado con los sistemas de la universidad**, el solver conoce al instante el catálogo de servicios (D6) y las ventanas de clases. En lugar de interrogar al estudiante con formularios largos, cruza sus restricciones en milisegundos y le propone únicamente citas 100 % viables: sábados y tardes extendidas.
   >
   > Toda decisión es 100 % auditable en el panel lateral **"Cómo decidió Ruta"**, con guardrails de entrada que filtran crisis o intentos clínicos, y guardrails de salida que validan que cada sede y horario existan en el campus.
   >
