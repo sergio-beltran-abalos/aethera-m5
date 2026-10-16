@@ -13,8 +13,134 @@ pinned: false
 
 **Entregable 2 · Desafío Ciudad Aethera · Misión M5: estigma y baja búsqueda de ayuda**
 
-Prototipo funcional de un asistente que convierte *«necesito ayuda»* en **una cita que el
-estudiante realmente puede cumplir**. Datos 100 % sintéticos del Data Pack de la organización.
+> Convierte *«necesito ayuda»* en **una cita que el estudiante realmente puede cumplir.**
+
+[![Python](https://img.shields.io/badge/Python-3.10%2B-2E7D8C)](https://www.python.org/)
+[![Gradio](https://img.shields.io/badge/Gradio-6.30-2E7D8C)](https://www.gradio.app/)
+[![IA responsable](https://img.shields.io/badge/IA--responsable-ficha%20publicada-2E8B6F)](FICHA_IA_RESPONSABLE.pdf)
+[![Privacidad](https://img.shields.io/badge/Consenso-ARCO-Ley%2029733-2E8B6F)](docs/FICHA_IA_RESPONSABLE.md)
+[![Datos](https://img.shields.io/badge/Datos-100%25%20sint%C3%A9ticos-D96C6C)](docs/INSTALACION.md)
+
+Prototipo de un asistente de orientación **no clínica** que traduce lenguaje cotidiano a
+motivos no clínicos, y propone citas compatibles con la agenda real del estudiante. Datos
+100 % sintéticos del Data Pack provisto por la organización.
+
+---
+
+## El problema en una cifra
+
+El **68 %** de los estudiantes con sintomatología ansiosa moderada-alta de UNI_NOVA_AETHER
+—1 868 de 2 739— **nunca ha consultado un servicio de apoyo**.
+
+No es que no busquen ayuda. Al analizar las 2 500 conversaciones de la línea de
+orientación (D5) se observa que el **62 % escribe fuera del horario de atención** y el
+**50 % llega entre las 18:00 y las 06:00**. Llegan cuando ya no hay nadie.
+
+Y cuando la información sí está disponible, sigue sin servir:
+
+| Medida | Valor |
+|---|---|
+| Turnos que muestra un directorio estático, por estudiante | **370** |
+| De esos, compatibles con su horario | **28,2 %** |
+| **Mediana de turnos realmente viables** | **0** |
+
+El estudiante que más necesita ayuda es el que tiene que revisar 370 opciones para
+encontrar, en el mejor caso, **una**.
+
+---
+
+## Qué hace
+
+**Pulse** — Registro de ánimo de 20 segundos. Opcional, con consentimiento expreso,
+privado y con derechos de acceso, exportación y supresión. No es un test: no calcula
+puntajes ni niveles. Produce un mes en colores que convierte una sensación difusa en algo
+visible.
+
+**Ruta** — Asistente de IA de orientación no clínica. Clasifica la necesidad, consulta
+servicios y calendario, y propone tres citas que no chocan con las clases, el trabajo ni el
+tiempo de traslado del estudiante. Reserva, reprograma y escala a una persona.
+
+**Bienestar** — Vista agregada para el equipo de bienestar. Toda celda con menos de
+**10 personas** se suprime. Los estados de ánimo individuales nunca se agregan.
+
+## Cómo funciona
+
+El principio que sostiene el diseño: **el modelo de lenguaje nunca decide datos**, solo
+decide *qué hacer* y *cómo decirlo*.
+
+```mermaid
+flowchart TD
+    U[Estudiante] --> G{{"① Guardrail de entrada<br/>crisis · clínico · privacidad · manipulación"}}
+    G -->|bloqueado| R[Respuesta fija + líneas de ayuda]
+    G -->|permitido| P{{"② Planificador<br/>acción + preferencias + señal de riesgo"}}
+    P -.->|"riesgo indirecto"| R
+    P --> H{{"③ Herramientas<br/>D1 · D2 · D3 · D5 · D6 · D7 + modelo ML"}}
+    H --> W["④ Redactor<br/>solo con datos ya calculados"]
+    W --> V{{"⑤ Guardrail de salida"}}
+    V -->|falla| T[Plantilla con datos verificados]
+    V -->|ok| S[Respuesta al estudiante]
+    H -.->|"sin turnos compatibles"| E[Seguimiento humano<br/>prioridad alta]
+
+    style G fill:#0E7C86,color:#fff
+    style P fill:#0E7C86,color:#fff
+    style H fill:#2E8B6F,color:#fff
+    style V fill:#0E7C86,color:#fff
+    style R fill:#D26161,color:#fff
+    style E fill:#F0B96B,color:#14213D
+```
+
+La contribución técnica central no es el asistente conversacional, sino el **solver de
+restricciones horarias** que cruza apertura del servicio × agenda del estudiante × carga
+académica × distancia real entre sedes.
+
+## Resultados
+
+| Métrica | Valor | Referencia |
+|---|---|---|
+| Clasificador de necesidad (validación cruzada) | **80,8 %** | Línea base 20,5 % |
+| Derivación del sistema actual, medida en D5 | **34,2 %** | Azar 33,3 % |
+| Modelo de asistencia (AUC) | **0,567** | Azar 0,50 |
+| Proyección del indicador de la misión | **68,2 % → 65,0 %** | Supuestos declarados |
+| Agenda: fracciones de turno realmente cumplibles | **100 %** | Por construcción |
+
+**El límite también se declara.** El modelo de asistencia rinde **0,44 de AUC** —por debajo
+del azar— en la franja de esperas que el prototipo ofrece, que constituye solo el 3,4 % del
+histórico. El sistema expone esa condición mediante un indicador de confianza en lugar de
+ocultarla.
+
+## Puesta en marcha
+
+```bash
+git clone https://github.com/sergio-beltran-abalos/aethera-m5.git
+cd aethera-m5
+```
+
+| Sistema | Comando |
+|---|---|
+| **Windows** | Doble clic en **`instalar.bat`** |
+| **macOS / Linux** | `chmod +x instalar.sh && ./instalar.sh` |
+
+El instalador verifica el entorno, crea el entorno virtual, instala las dependencias,
+comprueba los siete datasets del Data Pack y arranca la aplicación en
+<http://127.0.0.1:7860>.
+
+**La clave de API es opcional.** Sin ella el sistema opera con un clasificador entrenado
+sobre D5 y plantillas de respaldo: la funcionalidad completa, con menor calidad lingüística.
+
+> El Data Pack **no se redistribuye** con el código, conforme a las bases del desafío. Debe
+> obtenerse de la plataforma oficial y colocarse en `data/`.
+
+## Documentación
+
+| Documento | Contenido |
+|---|---|
+| [`docs/DOCUMENTO_E2.md`](docs/DOCUMENTO_E2.md) | Entregable 2: solución, uso de IA y resultados frente al indicador |
+| **[`FICHA_IA_RESPONSABLE.pdf`](FICHA_IA_RESPONSABLE.pdf)** | Ficha de IA responsable, una página |
+| [`docs/INSTALACION.md`](docs/INSTALACION.md) | Requisitos, proveedores, operación sin clave y publicación |
+| [`docs/IMPACTO.md`](docs/IMPACTO.md) | Proyección sobre el indicador, con supuestos y sensibilidad |
+| [`docs/COSTOS.md`](docs/COSTOS.md) | Viabilidad técnica y económica |
+| [`docs/GUION_VIDEO.md`](docs/GUION_VIDEO.md) | Especificación del video demostrativo |
+| [`notebook/`](notebook/) | Cuaderno de análisis con salida ya ejecutada |
 
 ---
 
@@ -23,7 +149,7 @@ estudiante realmente puede cumplir**. Datos 100 % sintéticos del Data Pack de l
 | | |
 |---|---|
 | **Equipo** | Aethera Pulse + Ruta |
-| **Institución objetivo** | UNI_NOVA_AETHER (ver §7, escalabilidad) |
+| **Institución objetivo** | UNI_NOVA_AETHER (ver §5, escalabilidad) |
 | **Contacto** | Sergio Edmundo Beltran Abalos · sergio.beltran@utec.edu.pe |
 
 ### Integrantes
@@ -47,39 +173,9 @@ estudiantes con sintomatología ansiosa moderada-alta nunca consultó un servici
 
 > **Continuidad E1 → E2.** El Entregable 1 delimitó *dónde* está la brecha, con D1/D2/D3/D6/D7.
 > Para el Entregable 2 analizamos **D4 y D5**, que llegaron en la segunda oleada, y ahí
-> aparecieron las tres causas concretas que la app ataca (ver §5).
+> aparecieron las tres causas concretas que la app ataca (ver §4).
 
-## 3. Qué hace y cómo funciona
-
-**Qué hace (2–3 líneas).** Pulse es un check-in de ánimo de 20 segundos, opcional y privado.
-Ruta es un asistente de IA de orientación **no clínica** que traduce lenguaje cotidiano a un
-motivo no clínico, consulta el catálogo y el calendario, y **propone solo citas compatibles
-con el horario real del estudiante**: nada que choque con sus clases, su trabajo ni el tiempo
-de traslado. Si no hay ninguna cita posible, ofrece pares como primer contacto y escala a una
-persona. **No diagnostica, no receta y no atiende emergencias.**
-
-**Arquitectura.** Un turno atraviesa cinco capas:
-
-```
-mensaje
-  ① Guardrail de entrada   patrones: crisis · clínico · privacidad · manipulación
-  ② Planificador          el LLM elige acción + preferencias + señal de riesgo
-       └─ 2.ª capa: el LLM detecta riesgo que las reglas no ven
-  ③ Herramientas          clasificación, calendario, catálogo, agenda, modelo ML
-  ④ Redactor              el LLM redacta SOLO con los resultados de ③
-  ⑤ Guardrail de salida   valida la respuesta; si falla → plantilla con datos verificados
-```
-
-**El principio que lo sostiene: el modelo de lenguaje nunca decide datos.** Solo decide *qué
-hacer* y *cómo decirlo*. Servicios, fechas, horas, canales y tiempos de espera salen de
-herramientas que leen el Data Pack. Si el redactor intenta inventar un servicio, una fecha o un
-teléfono, el guardrail lo detecta y se descarta su respuesta.
-
-**El motor de compatibilidad horaria es la aporte central.** No es un chatbot más: es un
-solver de restricciones que cruza apertura del servicio (D6) × agenda del estudiante (D1) ×
-carga académica (D3) × distancia real entre distritos (D6 GeoJSON).
-
-## 4. Modelos y herramientas de IA
+## 3. Modelos y herramientas de IA
 
 | Uso | Herramienta | Propósito |
 |---|---|---|
@@ -90,7 +186,7 @@ carga académica (D3) × distancia real entre distritos (D6 GeoJSON).
 **Transporte multi-proveedor:** `gemini` · `openai` · `huggingface` · `compatible` · `offline`.
 **Sin clave de API la app funciona completa** con el clasificador de D5 y plantillas.
 
-## 5. Datasets del Data Pack utilizados
+## 4. Datasets del Data Pack utilizados
 
 | | Uso en la solución |
 |---|---|
@@ -104,48 +200,7 @@ carga académica (D3) × distancia real entre distritos (D6 GeoJSON).
 
 > El Data Pack **no se redistribuye**. Copia los 7 archivos en `data/` antes de correr.
 
-## 6. Resultados
-
-### ¿Funciona el núcleo?
-
-**Match Rate de Ruta: 100 %** — pero ese 100 % es por construcción, porque filtrar la agenda
-*es* el producto. La cifra útil es otra:
-
-| Medida | Valor |
-|---|---|
-| Turnos que muestra un directorio estático | **370 por estudiante** |
-| De esos, compatibles con su horario | **28,2 %** |
-| **Mediana de turnos viables por estudiante** | **0** |
-| Estudiantes con algún turno viable | 87,3 % |
-
-### ¿Clasifica bien?
-
-| | |
-|---|---|
-| Clasificador de necesidad (validación cruzada, 5 folds) | **80,8 %** |
-| Línea base (clase mayoritaria) | 20,5 % |
-| Derivación actual del sistema, medida en D5 | **34,2 %** — es decir, **azar** (33,3 %) |
-
-### ¿El modelo aporta?
-
-| | |
-|---|---|
-| Modelo elegido | Regresión logística (AUC 0,567 > Gradient boosting 0,542) |
-| Feature más importante | `espera_dias` (+0,053 AUC), luego `contact_channel` (+0,020) |
-| **Y su límite, declarado** | En la franja que ofrece la demo (esperas ≤ 14 días) el AUC cae a **0,44** con solo 77 casos: **no discrimina bien**. Ruta lo muestra con un indicador de confianza en lugar de ocultarlo |
-
-### ¿Impacto sobre el 68 %?
-
-| Alcance 30 %, conversión 35 % | |
-|---|---|
-| Línea base | 68,2 % (1 868 de 2 739) |
-| Proyectado | **65,0 %** (−3,2 pp) |
-| Rango con supuestos plausibles | **−0,6 a −7,5 pp** |
-
-Supuestos declarados uno por uno y con análisis de sensibilidad en
-[`docs/IMPACTO.md`](docs/IMPACTO.md). Preferimos un número defendible a uno grande.
-
-## 7. Escalabilidad
+## 5. Escalabilidad
 
 Cambiar de institución es **una variable de entorno**:
 
@@ -158,7 +213,7 @@ El Data Pack ya trae 3 instituciones y 5 distritos, y las líneas de ayuda son b
 universidad de América Latina con un directorio de servicios, un calendario y un proveedor de
 IA despliega esto sin tocar el núcleo.
 
-## 8. Privacidad e IA responsable
+## 6. Privacidad e IA responsable
 
 Consentimiento expreso · datos sensibles bajo Ley 29733 (DS 016-2024-JUS) · ARCO completo
 (exportar y borrar desde la interfaz) · vista de Bienestar con supresión de celdas `< 10` ·
@@ -173,7 +228,7 @@ Entregables en la raíz del repositorio:
 
 Documento fuente de la ficha: [`docs/FICHA_IA_RESPONSABLE.md`](docs/FICHA_IA_RESPONSABLE.md)
 
-## 9. Estructura
+## 7. Estructura
 
 ```
 app.py                        Lanzador (HF Spaces exige app.py en la raíz)
@@ -198,55 +253,7 @@ tests/           Pruebas de humo
 data/            Data Pack (no redistribuir)
 ```
 
-## 10. Documentación
-
-| Documento | Contenido |
-|---|---|
-| **[`docs/INSTALACION.md`](docs/INSTALACION.md)** | Requisitos, puesta en marcha, proveedores, operación sin clave y publicación |
-| **[`docs/DOCUMENTO_E2.md`](docs/DOCUMENTO_E2.md)** | Entregable 2: solución, uso de IA y resultados frente al indicador |
-| **[`docs/FICHA_IA_RESPONSABLE.md`](docs/FICHA_IA_RESPONSABLE.md)** | Ficha de IA responsable (una página) |
-| [`docs/IMPACTO.md`](docs/IMPACTO.md) | Proyección sobre el indicador de la misión, con supuestos y sensibilidad |
-| [`docs/COSTOS.md`](docs/COSTOS.md) | Viabilidad técnica y económica |
-| [`docs/GUION_VIDEO.md`](docs/GUION_VIDEO.md) | Especificación del video demostrativo |
-
-## 11. Puesta en marcha
-
-**Instalación automática.** El repositorio incluye un instalador que verifica el entorno,
-crea el entorno virtual, instala las dependencias y comprueba la configuración:
-
-| Sistema | Archivo | Ejecución |
-|---|---|---|
-| Windows | `instalar.bat` | Doble clic |
-| macOS / Linux | `instalar.sh` | `chmod +x instalar.sh && ./instalar.sh` |
-
-Ambos verifican la presencia del Data Pack e indican exactamente qué archivo falta cuando la
-carpeta `data/` está incompleta.
-
-**Instalación manual:**
-
-```bash
-pip install -r requirements.txt
-python app.py                  # interfaz en http://127.0.0.1:7860
-python app.py --diagnostico    # verifica Data Pack, proveedor y clave
-```
-
-Procedimiento completo, proveedores alternativos y opciones de publicación en
-[`docs/INSTALACION.md`](docs/INSTALACION.md).
-
-**La clave de API es opcional.** En su ausencia el sistema opera con un clasificador
-entrenado sobre D5 (80,8 % de exactitud en validación cruzada) y con plantillas de respaldo.
-El escenario se verifica de forma automatizada mediante `tests/escenario_tercero.py`.
-
-| Variable | Predeterminado | Función |
-|---|---|---|
-| `AETHERA_PROVEEDOR` | `gemini` | `gemini` · `openai` · `huggingface` · `compatible` · `offline` |
-| `AETHERA_MODELO` | según proveedor | Identificador del modelo |
-| `AETHERA_DATA` | `./data` | Ubicación del Data Pack |
-| `AETHERA_INSTITUCION` | `UNI_NOVA_AETHER` | Institución a atender |
-| `AETHERA_LANZAR_UI` | `1` | `0` desactiva el arranque de la interfaz |
-| `AETHERA_SHARE` | `0` | `1` genera una dirección pública temporal |
-
-## 12. Video demostrativo
+## 8. Video demostrativo
 
 | | |
 |---|---|

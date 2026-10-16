@@ -1,1 +1,40 @@
-Copia aquí los 6 archivos del Data Pack (no se incluyen: las bases piden no redistribuirlos).
+DATA PACK — AETHERA PULSE + RUTA
+=================================
+
+Los datasets del Data Pack NO se incluyen en este repositorio.
+
+El Data Pack es provisto por la organización del Desafío Ciudad Aethera a
+través de la plataforma oficial. Las bases del desafío refieren que los datos
+son provistos por la organización y que los equipos no deben redistribuirlos en
+sus repositorios; el equipo se limita a declarar qué datasets utilizó.
+
+ARCHIVOS REQUERIDOS
+-------------------
+
+Coloque en esta carpeta los siete archivos del Data Pack:
+
+  D1_wellbeing_survey.csv            Encuesta de bienestar (12 000 registros)
+  D2_support_services.csv            Uso de servicios de apoyo (9 400 eventos)
+  D3_academic_trajectory.csv         Trayectoria académica (130 000 registros)
+  D4_testimonials.json               Corpus de testimonios (6 000 textos)
+  D5_help_line_conversations.json    Conversaciones de la línea de orientación (2 500)
+  D6_services_map.geojson            Mapa de servicios (15 servicios)
+  D7_calendar.csv                    Calendario y eventos académicos (32 eventos)
+
+VERIFICACIÓN
+------------
+
+Para comprobar que el entorno está completo:
+
+    python app.py --diagnostico
+
+Si falta algún archivo, la aplicación se detiene en el arranque e indica
+exactamente cuál. Los instaladores instalar.bat e instalar.sh realizan la
+misma comprobación antes de continuar.
+
+NOTA
+----
+
+Los datos son 100 % sintéticos. Aethera es una ciudad universitaria ficticia
+del desafío binacional Chile–Perú: no representa personas, lugares ni servicios
+reales.
