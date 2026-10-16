@@ -139,6 +139,7 @@ sobre D5 y plantillas de respaldo: la funcionalidad completa, con menor calidad 
 | [`docs/INSTALACION.md`](docs/INSTALACION.md) | Requisitos, proveedores, operación sin clave y publicación |
 | [`docs/IMPACTO.md`](docs/IMPACTO.md) | Proyección sobre el indicador, con supuestos y sensibilidad |
 | [`docs/COSTOS.md`](docs/COSTOS.md) | Viabilidad técnica y económica |
+| [`docs/PUBLICACION.md`](docs/PUBLICACION.md) | Opciones de publicación: coste cero, sin tarjeta |
 | [`docs/GUION_VIDEO.md`](docs/GUION_VIDEO.md) | Especificación del video demostrativo |
 | [`notebook/`](notebook/) | Cuaderno de análisis con salida ya ejecutada |
 
