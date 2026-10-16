@@ -101,8 +101,10 @@ CSS = f"""
 #temas-pulse label {{ border-radius:999px !important; font-size:13px !important; }}
 
 /* ── Botones ──────────────────────────────────────────────────── */
-#btn-registrar, #btn-hablar {{ border-radius:12px !important; font-weight:600 !important;
-  height:44px !important; }}
+#btn-registrar, #btn-hablar, #btn-ir-ruta {{ border-radius:12px !important;
+  font-weight:600 !important; height:44px !important; }}
+#btn-ir-ruta {{ background:#0E7C86 !important; color:#fff !important;
+  border:none !important; width:100% !important; }}
 #btn-persona {{ background:#FFF7EC !important; border:1.5px solid #F0C89A !important;
   color:#8A5416 !important; border-radius:12px !important; font-weight:600 !important; }}
 #btn-ayuda {{ font-size:12.5px !important; }}
@@ -415,6 +417,30 @@ def html_panel_traza(sesion) -> str:
     if t.get("derivacion_humana"):
         L.append("- 👥 **Derivación o seguimiento humano registrado**")
     return "\n".join(L)
+
+
+def html_oferta_ruta(mensaje: str | None) -> str:
+    """
+    Aviso de que Ruta escribió primero, mostrado en la pestaña donde el
+    estudiante está.
+
+    Sin esto, la oferta se registra en el chat de otra pestaña y el estudiante
+    no llega a verla: la iniciativa existe pero no se percibe, que es lo
+    mismo que no tenerla.
+    """
+    if not mensaje:
+        return ""
+    cuerpo = (mensaje.split("\n\n", 1)[-1]
+              if mensaje.startswith("Soy Ruta") else mensaje)
+    return f"""
+    <div style="margin-top:14px;border:1px solid {PETROLEO};border-left:4px solid {PETROLEO};
+                border-radius:10px;background:#F0F9F9;padding:14px 16px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <span style="font-size:11px;font-weight:700;letter-spacing:.6px;
+                     text-transform:uppercase;color:{PETROLEO}">Ruta te escribió primero</span>
+      </div>
+      <div style="font-size:13.5px;line-height:1.55;color:{TINTA};white-space:pre-wrap">{cuerpo}</div>
+    </div>"""
 
 
 def html_estilo_evento() -> str:

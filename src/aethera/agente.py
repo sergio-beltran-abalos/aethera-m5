@@ -88,6 +88,13 @@ class Sesion:
     def registrar(self, evento: str, **datos) -> None:
         EVENTOS.append({"sesion": self.id, "evento": evento, "turno": self.turnos, **datos})
 
+    def oferta_proactiva_frase(self) -> str | None:
+        """El texto exacto que Ruta propuso, para mostrarlo fuera del chat."""
+        if not self.oferta_proactiva:
+            return None
+        return next((h["texto"] for h in reversed(self.historial)
+                     if h["rol"] == "ruta" and "Te escribo" in h["texto"]), None)
+
     def nombre_evento(self, servicio: str, distrito: str, tipo: str = "",
                       canal: str = "") -> tuple[str, str]:
         """

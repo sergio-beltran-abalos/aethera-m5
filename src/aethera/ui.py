@@ -20,6 +20,15 @@ FORZAR_TEMA_CLARO = """() => {
   }
 }"""
 
+# Cambio de pestaña por JS en vez de por gr.Tabs: no depende de la version de
+# Gradio ni de su API interna de actualizacion, que ha cambiado varias veces.
+IR_A_RUTA_JS = """() => {
+  const b = [...document.querySelectorAll('.tab-nav button, [role=tab]')]
+            .find(x => /Ruta/.test(x.textContent || ''));
+  if (b) { b.click(); return 'ruta'; }
+  return 'no-encontrada';
+}"""
+
 
 def tema():
     import gradio as gr
@@ -56,6 +65,10 @@ def _reiniciar(nombre: str, etiqueta_fecha: str, con_historial: bool):
 
 
 def _consentir(acepta: bool, con_historial: bool, sesion):
+    import gradio as gr
+    if sesion is None:
+        gr.Warning("Un momento: todavía se está preparando la sesión.")
+        return "", vistas.html_frase(), sesion
     if acepta:
         sesion.consentimiento_pulse = True
         sesion.registrar("consentimiento_pulse")
@@ -69,9 +82,14 @@ def _consentir(acepta: bool, con_historial: bool, sesion):
 
 def _registrar(id_mood: str, temas, nota: str, sesion, estilo_evento: str, chat):
     import gradio as gr
+    if sesion is None:          # la sesion se crea en app.load; si falta, es un arranque en frio
+        gr.Warning("Un momento: todavía se está preparando la sesión.")
+        return (vistas.html_frase(), "", sesion, chat, "",
+                gr.update(visible=False))
     if not id_mood:
         gr.Warning("Elige cómo te sientes hoy.")
-        return vistas.html_frase(), vistas.html_mood_track(sesion), sesion, chat
+        return (vistas.html_frase(), vistas.html_mood_track(sesion), sesion, chat,
+                "", gr.update(visible=False))
 
     sesion.estilo_evento = estilo_evento or "neutro"
     resultado = pulso.registrar(sesion, id_mood, temas or [], nota)
@@ -81,9 +99,10 @@ def _registrar(id_mood: str, temas, nota: str, sesion, estilo_evento: str, chat)
         sesion.oferta_contacto = True
 
     # Ruta puede escribir primero si el momento lo justifica.
-    chat, sesion = _ofrecer(sesion, chat)
+    mensaje, _ = _ofrecer(sesion, chat)
+    aviso = vistas.html_oferta_ruta(mensaje[-1]["content"] if mensaje else None)
     return (vistas.html_frase(resultado), vistas.html_mood_track(sesion),
-            sesion, chat)
+            sesion, mensaje, aviso, gr.update(visible=bool(mensaje)))
 
 
 def _ofrecer(sesion, chat):
@@ -96,20 +115,29 @@ def _ofrecer(sesion, chat):
 
 def _abrir_chat(sesion, chat, estilo_evento):
     import gradio as gr
+    if sesion is None:
+        gr.Warning("Un momento: todavía se está preparando la sesión.")
+        return chat, sesion, "", "", gr.update(visible=False)
     sesion.estilo_evento = estilo_evento or "neutro"
 
     # Si hay un disparador pendiente se respeta ese turno: el estudiante no
     # tiene por qué preguntar para que el sistema le ofrezca una cita.
     chat, sesion = _ofrecer(sesion, chat)
     if sesion.oferta_proactiva:
-        return chat, sesion, vistas.html_panel_traza(sesion)
+        return (chat, sesion, vistas.html_panel_traza(sesion),
+                vistas.html_oferta_ruta(sesion.oferta_proactiva_frase()),
+                gr.update(visible=True))
 
     if not any(e["fecha"] == C.FECHA_DEMO for e in sesion.mood_track):
-        gr.Warning("Registra tu día en Pulse primero, o cuéntame directo aquí.")
-        return chat, sesion, vistas.html_panel_traza(sesion)
+        aviso = (f'<div style="margin-top:14px;border:1px solid {vistas.BORDE};border-radius:10px;'
+                 f'padding:12px 14px;font-size:13px;color:{vistas.TEXTO_SUAVE};background:#FFFBEB">'
+                 f'Registra tu día en Pulse primero, o cuéntame directo en la pestaña Ruta.</div>')
+        return chat, sesion, vistas.html_panel_traza(sesion), aviso, gr.update(visible=False)
 
-    return ((chat or []) + [{"role": "assistant", "content": pulso.abrir_chat(sesion)}],
-            sesion, vistas.html_panel_traza(sesion))
+    texto = pulso.abrir_chat(sesion)
+    aviso = vistas.html_oferta_ruta(texto)
+    return ((chat or []) + [{"role": "assistant", "content": texto}],
+            sesion, vistas.html_panel_traza(sesion), aviso, gr.update(visible=False))
 
 
 
@@ -117,6 +145,9 @@ def _abrir_chat(sesion, chat, estilo_evento):
 
 def _borrar(sesion):
     import gradio as gr
+    if sesion is None:
+        gr.Warning("Todavía no hay nada que borrar.")
+        return "", vistas.html_frase(), sesion, None
     pulso.borrar(sesion)
     gr.Info("Tu registro de Pulse fue borrado.")
     return vistas.html_mood_track(sesion), vistas.html_frase(), sesion, None
@@ -124,7 +155,7 @@ def _borrar(sesion):
 
 def _descargar(sesion):
     import gradio as gr
-    if not sesion.mood_track:
+    if sesion is None or not sesion.mood_track:
         gr.Warning("Todavía no hay registros para descargar.")
         return None
     return pulso.exportar(sesion)
@@ -134,8 +165,12 @@ def _descargar(sesion):
 
 
 def _enviar(texto: str, sesion, chat):
+    import gradio as gr
+    if sesion is None:
+        gr.Warning("Un momento: todavía se está preparando la sesión.")
+        return "", chat, sesion, "", "", ""
     if not (texto or "").strip():
-        return "", chat, sesion, vistas.html_panel_traza(sesion), vistas.tabla_reservas_html()
+        return "", chat, sesion, vistas.html_panel_traza(sesion), vistas.tabla_reservas_html(), ""
     respuesta, _ = agente.procesar_mensaje(sesion, texto)
     chat = (chat or []) + [{"role": "user", "content": texto},
                            {"role": "assistant", "content": respuesta}]
@@ -144,6 +179,10 @@ def _enviar(texto: str, sesion, chat):
 
 
 def _persona(sesion, chat):
+    import gradio as gr
+    if sesion is None:
+        gr.Warning("Un momento: todavía se está preparando la sesión.")
+        return chat, sesion, "", ""
     solicitud = agente.solicitar_contacto_humano(sesion, origen="botón")
     texto = agente.texto_contacto_humano(solicitud, sesion.perfil)
     sesion.historial.append({"rol": "ruta", "texto": texto})
@@ -204,6 +243,13 @@ def construir():
                                                      elem_id="btn-registrar")
                             btn_hablar = gr.Button("💬  Hablar con Ruta", elem_id="btn-hablar")
                         frase = gr.HTML()
+                        # Ruta escribe primero, pero desde la pestana Ruta. Si la
+                        # oferta solo viviera en el chat, se registraria en otra
+                        # pestana y el estudiante no se enteraria: se muestra aqui
+                        # y se ofrece el salto.
+                        aviso_ruta = gr.HTML()
+                        btn_ir_ruta = gr.Button("💬  Ver la propuesta de Ruta",
+                                                elem_id="btn-ir-ruta", visible=False)
 
                     with gr.Column(scale=6, elem_classes="panel"):
                         track = gr.HTML()
@@ -266,14 +312,16 @@ def construir():
             f'proveedor de IA: <code>{C.PROVEEDOR}</code> · modelo: <code>{C.MODELO}</code></div>')
 
         # ── Conexiones ───────────────────────────────────────────────────────
-        salidas = [estado, chat, ficha, track, frase, panel, reservas, bienestar, archivo, mood]
+        salidas = [estado, chat, ficha, track, frase, panel, reservas, bienestar, archivo, mood,
+                   aviso_ruta, btn_ir_ruta]
         entradas = [sel_perfil, sel_fecha, chk_historial]
 
         def _init(nombre, fecha, hist):
             sesion, chat0, ficha_html, track_html, frase_html, panel_html, \
                 reservas_html, bien_html, archivo_out, _ = _reiniciar(nombre, fecha, hist)
             return (sesion, chat0, ficha_html, track_html, frase_html, panel_html,
-                    reservas_html, bien_html, archivo_out, None)
+                    reservas_html, bien_html, archivo_out, None, "",
+                    gr.update(visible=False))
 
         app.load(_init, entradas, salidas)
         for control in (sel_perfil, sel_fecha, chk_historial):
@@ -283,8 +331,10 @@ def construir():
         consentimiento.input(_consentir, [consentimiento, chk_historial, estado],
                              [track, frase, estado])
         btn_registrar.click(_registrar, [mood, temas, nota, estado, estilo_evento, chat],
-                            [frase, track, estado, chat])
-        btn_hablar.click(_abrir_chat, [estado, chat, estilo_evento], [chat, estado, panel])
+                            [frase, track, estado, chat, aviso_ruta, btn_ir_ruta])
+        btn_hablar.click(_abrir_chat, [estado, chat, estilo_evento],
+                         [chat, estado, panel, aviso_ruta, btn_ir_ruta])
+        btn_ir_ruta.click(None, js=IR_A_RUTA_JS)
         btn_borrar.click(_borrar, [estado], [track, frase, estado, archivo])
         btn_descargar.click(_descargar, [estado], [archivo])
         entrada.submit(_enviar, [entrada, estado, chat],

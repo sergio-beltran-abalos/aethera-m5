@@ -36,13 +36,15 @@ r = check("_consentir", ui._consentir(True, True, sesion), 3)
 print(f"    consentimiento={sesion.consentimiento_pulse} historial={len(sesion.mood_track)}")
 
 # 2. registro sin seleccionar animo
-check("_registrar (sin eleccion)", ui._registrar("", [], "", sesion, "neutro", []), 4)
+check("_registrar (sin eleccion)", ui._registrar("", [], "", sesion, "neutro", []), 6)
 
 # 3. registro con animo y estilo neutro -> puede disparar proactividad
 r = check("_registrar (con animo)", ui._registrar("pesado", ["Estudios"], "dormi poco",
-                                                   sesion, "neutro", []), 4)
-frase, track, sesion, chat = r
-print(f"    chat={len(chat)} turno | ultimo: {str(chat[-1]['content'])[:60] if chat else '(vacio)'}")
+                                                   sesion, "neutro", []), 6)
+frase, track, sesion, chat, aviso, btn = r
+print(f"    chat={len(chat)} turno | aviso={len(aviso)} chars | boton visible={btn.get('visible')}")
+if chat:
+    print(f"    ultimo turno: {str(chat[-1]['content'])[:60]}")
 
 # 4. el chat recibio la oferta proactiva
 if not any(m["role"] == "assistant" for m in chat):
@@ -51,9 +53,16 @@ if not any(m["role"] == "assistant" for m in chat):
 else:
     print("  . Ruta escribio primero OK")
 
+# 4b. y ademas se muestra en la pestana donde esta el estudiante
+if "Ruta te escribió primero" not in (aviso or ""):
+    fallos.append("la oferta no se muestra en la pestana Pulse")
+    print("  x el aviso de la oferta no aparece en Pulse")
+else:
+    print("  . la oferta se ve sin cambiar de pestana OK")
+
 # 5. abrir chat con estilo distinto
-r = check("_abrir_chat", ui._abrir_chat(sesion, chat, "servicio"), 3)
-print(f"    estilo ahora = {sesion.estilo_evento}")
+r = check("_abrir_chat", ui._abrir_chat(sesion, chat, "servicio"), 5)
+print(f"    estilo ahora = {sesion.estilo_evento} | aviso={len(r[3])} chars")
 
 # 6. enviar un mensaje
 r = check("_enviar", ui._enviar("tengo muchas entregas y no duermo", sesion, chat), 6)
@@ -81,6 +90,24 @@ check("_borrar", ui._borrar(sesion), 4)
 check("_descargar", ui._descargar(sesion), 1)
 check("_persona", ui._persona(sesion, []), 4)
 check("html_bienestar", ui.vistas.html_bienestar(), 1)
+
+# Arranque en frio: la sesion se crea en app.load. Si un handler llega antes,
+# no debe reventar con AttributeError, porque el estudiante solo ve un error.
+print("\nArranque en frío (sesion todavia no creada):")
+for nombre, fn, args, esperados in [
+    ("_consentir", ui._consentir, (True, True, None), 3),
+    ("_registrar", ui._registrar, ("regular", [], "", None, "neutro", []), 6),
+    ("_abrir_chat", ui._abrir_chat, (None, [], "neutro"), 5),
+    ("_borrar", ui._borrar, (None,), 4),
+    ("_descargar", ui._descargar, (None,), 1),
+    ("_enviar", ui._enviar, ("hola", None, []), 6),
+    ("_persona", ui._persona, (None, []), 4),
+]:
+    try:
+        check(nombre, fn(*args), esperados)
+    except Exception as e:  # noqa: BLE001
+        fallos.append(f"{nombre} sin sesion lanza {type(e).__name__}: {e}")
+        print(f"  x {nombre} sin sesion lanza {type(e).__name__}: {e}")
 
 # 10. el panel de trazabilidad debe renderizar tambien el turno proactivo,
 #     que no pasa por el LLM y por eso tiene menos campos.
