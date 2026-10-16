@@ -355,11 +355,16 @@ def plantilla(accion: str, resultados: dict, sesion: Sesion) -> str:
     if accion == "abrir_desde_pulse":
         p = resultados["registro_pulse"]
         hoy = p.get("hoy") or {}
-        temas = f" (sobre todo por {', '.join(hoy['temas']).lower()})" if hoy.get("temas") else ""
-        patron = " También vi que esta semana marcaste varios días pesados." if p.get("patron_dias_pesados") else ""
-        return (f"{intro}Vi que hoy marcaste tu día como «{str(hoy.get('animo', 'regular')).lower()}»"
-                f"{temas}.{patron} ¿Quieres contarme qué es lo que más te está pesando? Puedo "
-                "ayudarte a encontrar un espacio de apoyo que calce con tu horario.")
+        animo = str(hoy.get("animo", "regular")).lower().replace("_", " ")
+        temas = f" (con foco en {', '.join(hoy['temas']).lower()})" if hoy.get("temas") else ""
+        patron = " También vi que esta semana tuviste varios días pesados." if p.get("patron_dias_pesados") else ""
+        if animo in ("bien", "muy bien"):
+            pregunta = ("¿Hay algo en lo que te pueda orientar hoy? Si quieres conversar o si buscas "
+                        "un espacio de apoyo que calce con tu horario, aquí estoy.")
+        else:
+            pregunta = ("¿Quieres contarme qué es lo que más te está pesando? Puedo ayudarte a "
+                        "encontrar un espacio de apoyo que calce con tu horario.")
+        return f"{intro}Vi que hoy marcaste tu día como «{animo}»{temas}.{patron} {pregunta}"
 
     if resultados.get("fuera_de_rol"):
         return (f"{intro}Eso no lo puedo hacer: no resuelvo tareas ni temas fuera de la "
