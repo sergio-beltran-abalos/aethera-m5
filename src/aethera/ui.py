@@ -100,34 +100,29 @@ def _registrar(id_mood: str, temas, nota: str, sesion, estilo_evento: str, chat)
     if resultado.get("crisis"):
         sesion.oferta_contacto = True
 
-    # Ruta puede dejar una sugerencia si el momento la justifica: un patrón de
-    # días pesados propios o un evento institucional que se acerca.
-    chat, oferta = _ofrecer(sesion, chat)
+    # Si hay sugerencia proactiva (evento o patrón), se evalúa para la tarjeta en Pulse
+    # y se preparan las opciones en sesion.opciones, sin volcarlas como elección forzada.
+    _, oferta = agente.ofrecer_proactivamente(sesion)
     aviso = vistas.html_oferta_ruta(oferta, len(sesion.opciones or []))
+
+    # El chat inicia como una conversación normal con contexto del registro de Pulse:
+    # no manda de frente a elegir citas ni vuelca listas de opciones.
+    if not any(m.get("role") == "user" for m in (chat or [])):
+        sesion.historial = [h for h in sesion.historial if h.get("rol") == "user"]
+        texto = pulso.abrir_chat(sesion)
+        chat = [{"role": "assistant", "content": texto}]
+
     return (vistas.html_frase(resultado), vistas.html_mood_track(sesion),
             sesion, chat, aviso, gr.update(visible=bool(oferta)))
-
-
-def _ofrecer(sesion, chat):
-    """
-    Deja una sugerencia de Ruta en el chat si el momento la justifica.
-
-    Devuelve (chat, oferta). La oferta solo viene cuando de verdad se añadió un
-    turno: quien la muestre fuera de la conversación no debe repetir la anterior.
-    """
-    mensaje, oferta = agente.ofrecer_proactivamente(sesion)
-    if not oferta:
-        return chat, None
-    return (chat or []) + [{"role": "assistant", "content": mensaje}], oferta
 
 
 def _abrir_chat(sesion, chat, estilo_evento):
     """
     «Hablar con Ruta»: abre la conversación y saluda.
 
-    La iniciativa es del estudiante. Aquí Ruta no adelanta ninguna propuesta: si
-    el momento la justificaba, ya la dejó como sugerencia en Pulse y registrada
-    en el chat. Este botón solo abre la ventana para que el estudiante escriba.
+    La iniciativa es del estudiante. Inicia como un chat normal con contexto de lo
+    que registró en Pulse (si registró hoy), sin adelantar opciones ni mandar a
+    elegir turnos de frente.
     """
     import gradio as gr
     if sesion is None:
@@ -135,9 +130,10 @@ def _abrir_chat(sesion, chat, estilo_evento):
         return chat, sesion, "", "", gr.update(visible=False)
     sesion.estilo_evento = estilo_evento or "neutro"
 
-    # Se saluda una sola vez: la conversación la empieza quien escribe.
-    if not chat:
-        if any(e["fecha"] == C.FECHA_DEMO for e in sesion.mood_track):
+    tiene_mensaje_usuario = any(m.get("role") == "user" for m in (chat or []))
+    if not tiene_mensaje_usuario:
+        if any(e["fecha"] == C.FECHA_DEMO for e in (sesion.mood_track or [])):
+            sesion.historial = [h for h in sesion.historial if h.get("rol") == "user"]
             texto = pulso.abrir_chat(sesion)
         else:
             texto = ("Hola 👋 Soy Ruta, un asistente de IA de orientación (no clínica). "
