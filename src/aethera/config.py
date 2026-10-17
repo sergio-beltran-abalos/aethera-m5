@@ -56,8 +56,9 @@ CLAVE_POR_PROVEEDOR = {
 # Límites de la capa gratuita, para la sección de costo de la ficha.
 COSTO_REF = {
     "gemini": "Gemini free tier (15 RPM · 1 millón de tokens/día)",
-    "espacio": "Hugging Face Spaces · CPU básica gratuita",
-    "nota": "Costo marginal ≈ 0 USD con el uso previsto del piloto; ver docs/COSTOS.md",
+    "alojamiento": "equipo propio + túnel de Cloudflare · sin costo, sin tarjeta",
+    "nota": "Costo marginal ≈ 0 USD; ninguna etapa requiere tarjeta de crédito. "
+            "Ver docs/COSTOS.md y docs/PUBLICACION.md",
 }
 
 # ─────────────────────────────────────────────────────────────────────────────

@@ -1,152 +1,103 @@
-# Ficha de IA Responsable — Aethera Pulse + Ruta
-
-**Entregable 2 · Desafío Ciudad Aethera · Misión M5 (estigma y baja búsqueda de ayuda)**
-Versión 2.0 · Una página · Datos 100 % sintéticos del Data Pack de la organización
-
+---
+title: Ficha de IA Responsable · Aethera Pulse + Ruta
 ---
 
-## 1. Modelos y herramientas de IA
+**Entregable 2 · Desafío Ciudad Aethera · Misión M5** · Datos 100 % sintéticos del Data Pack.
+Aethera es una ciudad universitaria ficticia del desafío binacional Chile–Perú.
 
-| Uso | Modelo | Proveedor | Propósito |
-|---|---|---|---|
-| Clasificador de necesidad | Modelo de lenguaje + respaldo TF-IDF/LogReg | Google Gemini (`gemini-3.5-flash-lite`) | Elegir 1 de 5 motivos **no clínicos**. Nunca diagnostica. |
-| Planificador de turno | Modelo de lenguaje + respaldo de reglas | Google Gemini (mismo) | Elegir 1 de 7 acciones y extraer preferencias. No aporta datos. |
-| Redactor | Modelo de lenguaje + plantillas fijas | Google Gemini (mismo) | Formular la respuesta **solo** a partir de datos ya calculados. |
-| Estimación de asistencia | Regresión logística (scikit-learn) | Entrenado localmente sobre D2 | Ordenar citas por probabilidad de asistencia. |
-| Clasificador de necesidad (offline) | TF-IDF + regresión logística | Entrenado localmente sobre D5 | Sustituye al clasificador cuando no hay clave. |
+## 1 · Modelos y herramientas
 
-**Transporte de modelos.** Se exponen cuatro proveedores (`gemini`, `openai`, `huggingface`,
-`compatible`) y `offline`. La demo y la publicación usan **nivel gratuito**; el costo
-marginal estimado es 0 USD dentro de los límites del piloto (ver `docs/COSTOS.md`).
+| Herramienta | Modelo / técnica | Propósito |
+|---|---|---|
+| Clasificador de necesidad | Gemini `gemini-3.5-flash-lite` (Google, free tier) | Elegir 1 de 5 motivos **no clínicos**. Nunca diagnostica |
+| Planificador | Gemini `gemini-3.5-flash-lite` | Elegir 1 de 7 acciones y extraer preferencias |
+| Redactor | Gemini `gemini-3.5-flash-lite` | Redactar **solo** con datos ya calculados |
+| Asistencia | Regresión logística sobre **D2** (9 400 eventos) | Ordenar citas por P(asistir). AUC 0,567 |
+| Clasificador sin LLM | TF-IDF + regresión logística sobre **D5** (2 500) | Sustituye al LLM sin clave. **80,8 %** CV vs 20,5 % base |
 
-**Principio rector.** El modelo de lenguaje **nunca decide datos**. Solo decide *qué hacer*
-y *cómo decirlo*. Servicios, fechas, horas, canales, esperas y teléfonos salen de
-herramientas que leen el Data Pack. Si el redactor intenta inventar un servicio, una fecha o
-un teléfono, el guardrail de salida lo detecta y su respuesta se descarta por una plantilla
-con datos verificados.
+**Principio rector: el modelo de lenguaje nunca decide datos**, solo *qué hacer* y *cómo
+decirlo*. Servicios, fechas, horas y teléfonos salen de herramientas que leen el Data Pack; si
+el redactor los inventa, el guardrail de salida lo detecta y su respuesta se descarta por una
+plantilla verificada. Proveedores intercambiables; **sin clave de API la app funciona completa**.
 
-## 2. Datos utilizados
+## 2 · Datos utilizados
 
-Solo los siete datasets sintéticos del Data Pack: **D1** (bienestar, 12 000), **D2** (uso de
-servicios, 9 400), **D3** (trayectoria, 130 000), **D4** (testimonios, 6 000), **D5** (conversaciones,
-2 500), **D6** (mapa de servicios, 15) y **D7** (calendario, 32).
+Solo los siete datasets sintéticos del Data Pack: **D1** (12 000) · **D2** (9 400) · **D3**
+(130 000) · **D4** (6 000) · **D5** (2 500) · **D6** (15) · **D7** (32). **No se usan datos reales
+ni externos sensibles**; no hay identificadores de personas. Los tres estudiantes de la demo son filas reales de D1 del segmento M5, con identificadores sintéticos.
 
-**No se usan datos reales ni externos sensibles.** No hay identificadores de personas, no
-hay freer de contacto, no hay directorios de terceros. Los tres estudiantes de la demo son
-filas reales de D1 dentro del segmento M5, con identificadores sintéticos.
+**Transferencia internacional:** el texto del chat y, si el estudiante lo autoriza, su registro
+de ánimo salen hacia el proveedor del modelo. Bajo la Ley 29733 y su reglamento
+(DS 016-2024-JUS) eso exige evaluar el marco de protección del país de destino. Se asumen:
+encargado de tratamiento, **sin uso para entrenar**, mínimo de texto, sin identificadores.
+Declararlo es condición previa a cualquier despliegue real.
 
-**Qué sale del entorno del usuario.** El texto que el estudiante escribe en el chat y, si lo
-autoriza, su registro de ánimo. Se envía al proveedor del modelo: eso es una **transferencia
-internacional**, y por tanto exige evaluar el marco de protección del país de destino
-(Ley 29733, DS 016-2024-JUS). Compromisos asumidos: contrato de encargado de tratamiento,
-**sin uso para entrenar**, mínimo de texto posible, sin identificadores y sin datos clínicos.
-Esta declaración es una condición previa a cualquier despliegue real, no una descripción de
-lo que ya está hecho.
+## 3 · Alcance y límites
 
-## 3. Alcance y límites
+**Hace:** traduce lenguaje cotidiano a un motivo no clínico; consulta servicios y calendario;
+propone citas compatibles con el horario real; reserva, reprograma y deriva a una persona.
 
-**Lo que hace:** convierte lenguaje cotidiano en un motivo no clínico; consulta los servicios
-y el calendario; propone citas compatibles con el horario real del estudiante; reserva,
-reprograma y ofrece derivación a una persona.
+**NO hace, por diseño:** no diagnostica ni evalúa gravedad clínica · no receta ni recomienda
+medicamentos o tratamientos · no es terapia · no atiende emergencias · no resuelve tareas
+académicas · no entrega datos de otros estudiantes · **no usa el nivel de ansiedad de nadie en
+tiempo de ejecución** (la segmentación es diagnóstico, no un disparador).
+**Apoya, no reemplaza, la atención profesional.**
 
-**Lo que NO hace, por diseño:**
-- **No diagnostica.** No evalúa gravedad clínica ni escala de riesgo.
-- **No receta ni recomienda medicamentos, dosis ni tratamientos.**
-- **No es terapia.** No mantiene seguimiento clínico ni actúa como profesional.
-- **No atiende emergencias.** Detecta señales de riesgo y entrega líneas de ayuda reales.
-- **No da consejo académico ni resuelve tareas.** Responde con amabilidad qué sí puede hacer.
-- **No entrega datos personales** de otros estudiantes ni de profesionales.
-- **No usa el nivel de ansiedad de nadie en tiempo de ejecución.** La segmentación por
-  `anxiety_band` es un paso de diagnóstico, no un disparador del producto. Ruta recibe solo
-  datos operativos: horario de estudio, trabajo, distrito, código de estudiante.
-
-**La solución apoya, no reemplaza, la atención profesional.**
-
-## 4. Riesgos identificados y mitigaciones
+## 4 · Riesgos y mitigaciones
 
 | Riesgo | Mitigación implementada |
 |---|---|
-| **Etiquetaje clínico** — el modelo podría decir "tienes ansiedad" | Guardrail de salida con 9 patrones; se acepta solo con negación previa ("no tienes…"). Si falla, cae a plantilla. |
-| **Falsificación de datos** — inventar servicio, fecha o teléfono | El LLM no accede a datos; todo pasa por herramientas. El guardrail valida contra el catálogo real. |
-| **Riesgo de autolesión no detectado** — quien dice "quiero desaparecer" sin usar las palabras del patrón | **Segunda capa:** el planificador (LLM) marca `senal_de_riesgo` y se activa el protocolo de crisis con líneas reales (Perú 113 / Chile \*4141 / SAMU). |
-| **Manipulación / inyección de prompt** | Patrones dedicados que bloquean y reafirman el rol no clínico. |
-| **Fuga de datos de otros estudiantes** | Patrón dedicado; la cola de contacto lleva solo código y motivo no clínico. |
-| **Falso consuelo** — el sistema refuerza una decisión equivocada | Tono validativo sin diagnóstico; nunca cierra con "ya estás bien"; ofrece derivación humana de forma explícita. |
-| **Sesgo del Data Pack** | Ver sección 5: tres sesgos detectados y documentados. |
-| **Modelo fuera de su rango** | El modelo de asistencia muestra un **indicador de confianza** cuando predice fuera de la zona con evidencia histórica, y esa nota se ve en pantalla. |
+| Etiquetaje clínico | Guardrail de salida con 9 patrones; se acepta solo con negación ("no tienes…"). Si falla, cae a plantilla |
+| Falsificación de datos | El LLM no accede a datos; todo pasa por herramientas, validadas contra el catálogo real |
+| **Autolesión no detectada por patrón** | **2.ª capa:** el planificador marca `senal_de_riesgo` y activa protocolo de crisis con líneas reales (Perú 113 · Chile \*4141 · SAMU) |
+| Manipulación / prompt injection | Patrones dedicados que bloquean y reafirman el rol no clínico |
+| Fuga de datos ajenos | Patrón dedicado; la cola de contacto lleva solo código y motivo no clínico |
+| Sesgo del Data Pack | Tres sesgos detectados y asumidos como decisiones de diseño (§6) |
+| Modelo fuera de rango | Indicador de confianza visible cuando predice fuera de la zona con evidencia histórica |
 
-## 5. Sesgos del Data Pack que encontramos
+## 5 · Supervisión humana
 
-El Data Pack incorpora sesgos deliberados. Tres los detectamos antes del Demo Day y son
-razones concretas de decisiones de diseño:
+- Botón permanente **"Quiero que una persona me contacte"**, que Ruta ofrece sola ante crisis.
+- **Cola de contacto humano** en la vista de Bienestar: prioridad, código y motivo **no
+  clínico**; nunca el texto ni el estado de ánimo.
+- Prioridad **automática** si el pedido viene de una señal de crisis, con la línea de ayuda
+  mientras se espera la atención.
+- **Escalamiento:** si no hay turnos compatibles, se registra seguimiento y se ofrece pares
+  como primer contacto, en vez de responder "no hay nada".
+- **Auditoría por diseño:** el panel "Cómo decidió Ruta" registra cada turno —acción, motivo,
+  herramientas, procedencia de cada dato y guardrails activados—.
 
-1. **El sentimiento de D4 refleja el canal, no a la persona.** El buzón está 100 % `strained`
-   y el foro no. **Decisión:** no usamos sentimiento de D4 como señal; D4 solo alimenta frases
-   de normalización agregadas.
-2. **El motivo declarado en D4 casi no se refleja en su texto.** Un clasificador de texto
-   rinde lo mismo que la clase mayoritaria. **Decisión:** no entrenamos con D4.
-3. **La derivación de D5 no depende del motivo.** Solo 34 % de las derivaciones apuntan al
-   tipo de servicio que D2 asocia a ese motivo, frente a 33 % de azar. **Decisión:** el mapa
-   motivo → servicio se toma de D2, nunca de D5.
+## 6 · Sesgos del Data Pack que encontramos
 
-## 6. Supervisión humana
+1. El sentimiento de D4 refleja el **canal**, no la persona (buzón 100 % `strained`, foro no) → no lo usamos como señal.
+2. El motivo declarado en D4 **casi no se refleja** en su texto → no entrenamos con D4.
+3. La derivación de D5 **no depende del motivo** (34,2 % de coherencia vs 33,3 % de azar) → el mapa motivo → servicio sale de D2.
 
-- **Derivación explícita.** Botón permanente "Quiero que una persona me contacte". Ruta lo
-  ofrece sola ante señal de crisis.
-- **Cola de contacto humano.** La vista de Bienestar muestra los pedidos pendientes con
-  prioridad, código de estudiante y motivo **no clínico**; nunca el texto ni el estado de ánimo.
-- **Prioridad automática.** Un pedido marcado en crisis entra con prioridad **alta** y la
-  respuesta incluye la línea de ayuda mientras se espera la atención humana.
-- **Escalamiento por falta de opciones.** Si no hay turnos compatibles, se registra
-  seguimiento y se ofrece pares como primer contacto, en vez de responder "no hay nada".
-- **Auditoría.** El panel "Cómo decidió Ruta" deja registro de cada turno: acción, motivo,
-  herramientas, procedencia de cada dato y guardrails activados. Es auditable por diseño.
+## 7 · Privacidad
 
-## 7. Privacidad
+**Consentimiento** expreso, informado y con finalidad; opcional y no condiciona ningún servicio.
+**Minimización:** el horario se usa solo para calcular franjas libres; nunca notas, puntajes ni
+asistencia. **Identidad separada** del contenido del registro. **ARCO completo desde la interfaz**
+(consultar, exportar JSON, borrar; borrar elimina también el uso posterior en el chat).
+**Agregación con umbral:** la vista de Bienestar suprime toda celda de menos de **10 personas**;
+los ánimos individuales nunca se agregan ni se comparten. **Sin uso secundario** (becas,
+evaluación, disciplina, publicidad) ni terceros, y **sin acceso individual** a docentes,
+autoridades ni áreas académicas o disciplinarias.
 
-- **Consentimiento.** Pulse no guarda nada sin consentimiento expreso, informed y con finalidad
-  declarada. Es opcional y no condiciona ningún servicio.
-- **Minimización.** El horario se usa solo para calcular franjas libres. No se usan puntajes,
-  notas ni asistencia para decidir nada. El registro de ánimo **nunca** se comparte con
-  Bienestar, ni en agregado.
-- **Identidad separada del contenido.** El código de estudiante se separa del contenido del
-  registro; el registro se cifra y es visible solo para su dueño.
-- **Derechos ARCO.** Consultar, corregir, **exportar** (JSON) y **borrar** desde la interfaz,
-  sin pasar por un ticket. Borrar elimina también el uso posterior en el chat.
-- **Agregación con umbral.** La vista de Bienestar suprime toda celda con menos de
-  **10 personas** (`K_MINIMO`). No hay medias individuals ni distribuciones pequeñas.
-- **Sin uso secundario.** Los datos no se usan para becas, evaluación, disciplina ni publicidad,
-  y no se comparten con terceros.
-- **Sin acceso individual.** Docentes, autoridades y áreas académicas o disciplinarias no
-  acceden al registro individual.
+## 8 · Transparencia hacia el usuario
 
-## 8. Transparencia hacia el usuario
+Ruta se presenta como **IA de orientación no clínica** en el primer turno, en la interfaz y en
+cada respuesta de crisis. El estudiante **elige y rechaza** cada ruta y puede replanificar
+cuantas veces quiera. El panel de trazabilidad explica en lenguaje llano por qué se propuso
+cada cita. Pulse dice siempre quién ve el registro. El modelo de asistencia **declara sus
+límites en pantalla**, incluido que no discrimina bien en el rango de esperas que ofrece la demo.
 
-- Ruta se presenta como **IA de orientación no clínica** en el primer turno y lo repite en la
-  interfaz y en cada respuesta de crisis.
-- El estudiante **elige y rechaza** cada ruta propuesta; puede replanificar cuantas veces quiera.
-- El panel de trazabilidad explica, en lenguaje llano, por qué se propuso cada cita.
-- Pulse dice siempre quién ve el registro y para qué se usaría.
-- El modelo de asistencia declara sus límites en la vista de Bienestar, incluido el hecho de
-  que **no discrimina bien en el rango de esperas que la demo ofrece**.
-- Aethera es una ciudad ficticia y todos los datos son sintéticos; se declara en pantalla.
+## 9 · Marco normativo
 
-## 9. Contexto normativo
-
-Diseñado dentro del marco Peruvian: **Ley 29733** y su reglamento (**DS 016-2024-JUS**, en
-vigor desde el 30 de marzo de 2025), que califica los datos de salud como sensibles y exige
-consentimiento previo, informado, expreso e inequívoco con finalidad específica; y la **Ley
-31814** (**DS 115-2025-PCM**) sobre IA. La clasificación específica de Aethera se confirmará
-con asesoría legal antes de cualquier despliegue real, junto con una evaluación de impacto en
-protección de datos con un Oficial de Datos Personales.
-
-**Referencias de ecosistema.** El precedente más cercano, Woebot, cerró su aplicación de
-consumo en junio de 2025 por el costo de cumplir la autorización de la FDA y por falta de un
-marco claro para modelos de lenguaje. Aethera evita deliberadamente ese camino: no ofrece
-intervención clínica, mantiene la frontera con la atención profesional y es explícito con el
-usuario sobre sus límites.
-
----
-
-*Aethera es una ciudad universitaria ficticia del desafío binacional Chile–Perú. No hay
-personas, lugares ni servicios reales.*
+**Ley 29733** y su reglamento (**DS 016-2024-JUS**, vigente desde el 30 de marzo de 2025), que
+califica los datos de salud como sensibles y exige consentimiento expreso con finalidad
+específica; y **Ley 31814** (**DS 115-2025-PCM**). La clasificación específica de Aethera se
+confirmará con asesoría legal antes de cualquier despliegue real, junto con una evaluación de
+impacto con un Oficial de Datos Personales. **Precedente:** Woebot cerró su app de consumo en
+junio de 2025 por el costo de cumplir la autorización de la FDA; Aethera evita ese camino
+manteniéndose en orientación no clínica y siendo explícito sobre sus límites.

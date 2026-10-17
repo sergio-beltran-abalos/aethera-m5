@@ -216,74 +216,41 @@ evaluación observe exactamente lo que observó el equipo autor.
 
 ## 9. Opciones de publicación
 
-Ninguna de las alternativas siguientes requiere tarjeta de crédito para el alcance de este
-prototipo. La aplicabilidad de cada una fue verificada durante el desarrollo.
+El prototipo se publica sin tarjeta de crédito y sin costo. Las dos vías verificadas durante
+el desarrollo se describen en detalle en `PUBLICACION.md`.
 
-### 9.1 Túnel local (Cloudflare Tunnel) — recomendada
+| Opción | Coste | Pide tarjeta | Instalación extra | Verificada |
+|---|---|---|---|---|
+| `compartir.bat` / `.sh` | 0 USD | No | Cloudflare Tunnel | **Sí** |
+| `AETHERA_SHARE=1` | 0 USD | No | Ninguna | **Sí** |
 
-**Estado: verificada.** Genera una dirección pública HTTPS en segundos, sin cuenta y sin
-código en el repositorio.
+Hugging Face Spaces fue evaluada y descartada: aunque su nivel gratuito no genera cargo, la
+creación del Space solicita una tarjeta de crédito como verificación de identidad.
+
+### Vía rápida: enlace de Gradio
+
+```bash
+set AETHERA_SHARE=1        # Windows (CMD)
+export AETHERA_SHARE=1     # macOS / Linux
+python app.py
+```
+
+La salida muestra la dirección `https://<codigo>.gradio.live`. No requiere instalar nada.
+
+### Vía recomendada: túnel de Cloudflare
+
+El script `compartir.bat` (Windows) o `compartir.sh` (macOS/Linux) automatiza el proceso
+completo: verifica el entorno, comprueba el Data Pack, instala `cloudflared` si no está
+presente, inicia la aplicación y muestra la dirección
+`https://<aleatorio>.trycloudflare.com`.
+
+Procedimiento manual, si se prefiere ejecutarlo por separado:
 
 ```bash
 winget install --id Cloudflare.cloudflared     # Windows
 brew install cloudflared                       # macOS
-# Linux: descarga desde developers.cloudflare.com
 
 python app.py                                    # en una terminal
 cloudflared tunnel --url http://127.0.0.1:7860 # en otra
 ```
 
-La dirección mostrada en la salida (`https://<aleatorio>.trycloudflare.com`) es accesible
-desde cualquier red. El proceso de túnel debe permanecer activo mientras se necesite.
-
-La dirección cambia en cada ejecución. Para una dirección estable se requiere un dominio
-propio y una cuenta de Cloudflare, lo que excede el alcance de este prototipo.
-
-### 9.2 Dirección temporal de Gradio
-
-```bash
-set AETHERA_SHARE=1
-python app.py
-```
-
-El parámetro está implementado en `src/aethera/ui.py` y delega en el servicio de cómputo
-remoto de Gradio. **No fue verificable durante el desarrollo** por restricción de salida de
-red en el entorno de construcción; requiere verificación previa en la red de destino.
-
-### 9.3 Hugging Face Spaces
-
-El nivel **CPU Basic es gratuito**. La creación del Space puede solicitar una tarjeta de
-crédito como verificación de identidad; esto no genera cargo mientras no se superen los
-límites del nivel gratuito. Los recursos del nivel gratuito pueden liberarse tras un período
-prolongado de inactividad.
-
-Procedimiento:
-
-1. Crear un Space con SDK **Gradio** y visibilidad **Private**.
-2. Cargar `app.py`, `requirements.txt` y `README.md`.
-3. Crear el directorio `data/` y subir los siete archivos del Data Pack.
-4. En **Settings → Variables and secrets**, registrar `GEMINI_API_KEY`.
-5. El Space se compila automáticamente y queda disponible en una dirección estable.
-
-La visibilidad privada es obligatoria: el Data Pack no puede redistribuirse.
-
-### 9.4 Comparación de alternativas
-
-| Plataforma | Coste | Dirección estable | Requiere cuenta | Verificada |
-|---|---|---|---|---|
-| Cloudflare Tunnel | gratuito | No | No | **Sí** |
-| Gradio Share | gratuito | No | No | Pendiente |
-| Hugging Face Spaces (CPU Basic) | gratuito | Sí | Sí, con verificación | Pendiente |
-| Google Colab | gratuito | No | Sí | — |
-
-Para una revisión puntual o una demostración en vivo se recomienda **9.1**. Para una
-dirección estable que sobreviva al cierre del equipo autor se recomienda **9.3**.
-
-## 10. Consideraciones de seguridad
-
-- La clave de API se lee exclusivamente de variables de entorno. **Nunca se escribe en el
-  código, ni se imprime en consola, ni se versiona.**
-- `.gitignore` excluye `.venv/`, `.env` y los archivos exportados del registro de Pulse.
-- La clave puede revocarse desde el panel del proveedor sin afectar la ejecución del
-  prototipo.
-- Si la clave se ha expuesto por accidente, debe revocarse de inmediato y emitirse una nueva.

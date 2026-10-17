@@ -8,10 +8,12 @@ universitario del Entregable 2.
 | Recurso | Plan | Límite | ¿Suficiente? |
 |---|---|---|---|
 | Modelo de lenguaje | Gemini, nivel gratuito | 15 req/min · 1 M tokens/día | Sí. Un turno ≈ 3 llamadas ≈ 2 500 tokens |
-| Alojamiento | Hugging Face Spaces, CPU básica | gratuita | Sí. La aplicación es liviana |
+| Alojamiento | Equipo del usuario + túnel de Cloudflare | gratuita | Sí. La aplicación es liviana |
 | Modelo de asistencia | scikit-learn, local | sin costo | Sí |
 | Clasificador de necesidad | scikit-learn, local (D5) | sin costo | Sí |
 | Datos | Data Pack sintético | sin costo | — |
+
+No se requiere tarjeta de crédito en ninguna etapa. Véase `PUBLICACION.md`.
 
 **Estimación para el piloto universitario.** Si atienden 826 estudiantes (el segmento
 prioritario de UNI_NOVA_AETHER) y cada uno registra 4 días en Pulse y abre 2 conversaciones:

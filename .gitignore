@@ -10,6 +10,9 @@ mi_registro_pulse_*.json
 # Artefactos de conversion
 *.tmp.html
 
+# Artefactos locales de Gradio (certificado autofirmado)
+.gradio/
+
 # Sistema
 .DS_Store
 Thumbs.db

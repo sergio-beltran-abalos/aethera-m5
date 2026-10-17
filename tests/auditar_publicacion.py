@@ -102,7 +102,14 @@ if leeme.exists():
               if c + "_" not in texto]
     check(not faltan, "Las instrucciones enumeran los siete datasets"
           + (f" (faltan: {faltan})" if faltan else ""))
-    check("sintéticos" in texto, "Las instrucciones indican que los datos son sinteticos")
+    check("sintéticos" in texto, "Las instrucciones indican que los datos son sintéticos")
+
+# La ficha debe tener una unica fuente versionada: evita ambigüedad para quien lea.
+fuentes_ficha = [f for f in versionados
+                 if "FICHA_IA_RESPONSABLE" in f and f.endswith(".md")]
+check(len(fuentes_ficha) == 1,
+      "La ficha tiene una sola fuente en Markdown"
+      + (f" (encontradas: {fuentes_ficha})" if len(fuentes_ficha) != 1 else ""))
 
 print("\n" + "=" * 70)
 print(" 5 · TAMAÑO Y CONTENIDO PUBLICO")
