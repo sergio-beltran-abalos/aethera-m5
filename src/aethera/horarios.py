@@ -178,20 +178,29 @@ def resumen_fronteras(perfil: dict) -> dict:
     Ventanas realmente libres en un día lectivo, en minutos.
 
     Se calculan restando los bloques ocupados, en vez de sondear tres horas
-    sueltas: sondear 15:00 da "ocupado" a un estudiante libre a las 17:00.
+    sueltas: sondear las 15:00 da "ocupado" a un estudiante libre a las 17:00.
+
+    La ventana se recorta al rango en que un servicio puede abrir realmente
+    (06:00–23:30). Mostrar "libre de 00:00" no aporta información y confunde.
     """
-    ocupados = sorted(horarios_ocupados(perfil, 0))
-    libres, cursor = [], 0
+    DIA_INICIO = a_minutos("06:00")
+    DIA_FIN = a_minutos("23:30")
+
+    ocupados = sorted(bloques_ocupados(perfil, 0))
+    libres, cursor = [], DIA_INICIO
     for a, b in ocupados:
+        if b <= DIA_INICIO or a >= DIA_FIN:
+            continue
+        a, b = max(a, DIA_INICIO), min(b, DIA_FIN)
         if a > cursor:
             libres.append((cursor, a))
         cursor = max(cursor, b)
-    if cursor < 24 * 60:
-        libres.append((cursor, 24 * 60))
+    if cursor < DIA_FIN:
+        libres.append((cursor, DIA_FIN))
 
     return {
         "clases": _txt(bloque_clases(perfil)),
-        "ventanas_libres": [f"{a_hhmm(a)}–{a_hhmm(min(b, 23 * 60 + 30))}" for a, b in libres],
+        "ventanas_libres": [f"{a_hhmm(a)}–{a_hhmm(b)}" for a, b in libres],
         "manana": any(a < 12 * 60 for a, _ in libres),
         "tarde": any(12 * 60 <= a < 18 * 60 for a, _ in libres),
         "noche": any(a >= 18 * 60 for a, _ in libres),

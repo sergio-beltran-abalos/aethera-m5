@@ -244,11 +244,15 @@ def html_mood_track(sesion) -> str:
              or f'<span style="color:{TEXTO_SUAVE};font-size:12.5px">Sin temas aún</span>')
     leyenda = " ".join(f'<span style="font-size:12px;color:{TEXTO_SUAVE};white-space:nowrap;'
                       f'margin-right:10px">{m["emoji"]} {m["label"]}</span>' for m in pulso.MOODS)
-    cabecera = ('<div style="font-size:10.5px;color:%s;text-align:center;font-weight:600">'
-                % TEXTO_SUAVE).join([""] * 7).join(
-        [f'<div style="font-size:10.5px;color:{TEXTO_SUAVE};text-align:center;font-weight:600">{x}</div>'
-         for x in ["lu", "ma", "mi", "ju", "vi", "sá", "do"]]
-    ) + f'<div style="font-size:10px;color:{TEXTO_SUAVE};text-align:center;font-weight:600">prom.</div>'
+    # Encabezado de la grilla. Debe construirse concatenando celdas completas:
+    # cualquier otra forma deja etiquetas sin cerrar y el navegador colapsa la
+    # grilla en una sola columna.
+    etiqueta_dia = (f'<div style="font-size:10.5px;color:{TEXTO_SUAVE};'
+                    f'text-align:center;font-weight:600">%s</div>')
+    cabecera = "".join(etiqueta_dia % d
+                       for d in ["lu", "ma", "mi", "ju", "vi", "sá", "do"])
+    cabecera += (f'<div style="font-size:10px;color:{TEXTO_SUAVE};'
+                 f'text-align:center;font-weight:600">prom.</div>')
 
     alerta = ""
     if r["patron_dias_pesados"]:
