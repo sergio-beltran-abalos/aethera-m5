@@ -25,11 +25,43 @@ EVENTOS: list[dict] = []          # bitácora para KPIs (se recalculan en vivo)
 SOLICITUDES_CONTACTO: list[dict] = []
 _SESIONES = itertools.count(1)
 
+# Sedes del campus. Los identificadores del Data Pack son DIST_GAIA, DIST_VECTOR…
+# y no son presentables: se traduce una vez para no repetir el .replace() en cada
+# capa y para que la interfaz diga siempre lo mismo.
+_SEDE = {
+    "DIST_GAIA": "Sede Gaia",
+    "DIST_HORIZON": "Sede Horizonte",
+    "DIST_NEBULA": "Sede Nebula",
+    "DIST_QUANTUM": "Sede Quantum",
+    "DIST_VECTOR": "Sede Vector",
+}
+
+
+def nombre_sede(distrito: str) -> str:
+    return _SEDE.get(distrito, (distrito or "").replace("DIST_", "").title() or "Campus")
+
+
+# Días de margen tras el fin de un evento institucional para encore un turno.
+# La semana de pausa puede estar llena: sin este margen el estudiante vería
+# «no hay nada» el mismo día que se le ofreció.
+DIAS_GRACIA_EVENTO = 4
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Sesión
 # ─────────────────────────────────────────────────────────────────────────────
 class Sesion:
+    """
+    Estado de una conversación con Ruta.
+
+    `estilo_evento` gobierna cuánto de la cita es visible para terceros. El
+    valor por defecto es el más protector: el nombre del servicio es lo único
+    que delata el motivo, y ocultarlo no impide que el estudiante vea el detalle
+    dentro de la aplicación ni llegue a tiempo a la cita.
+    """
+
+    ESTILOS_EVENTO = ("neutro", "servicio", "completo")
+
     def __init__(self, perfil: dict, nombre_perfil: str = "", agenda: servicios.Agenda | None = None):
         self.id = f"S-{next(_SESIONES):03d}"
         self.perfil = perfil
@@ -49,9 +81,32 @@ class Sesion:
         self.consentimiento_pulse = False
         self.oferta_contacto = False
         self.hora_inicio = None
+        self.estilo_evento = "neutro"          # por defecto, el que menos revela
+        self.disparadores_vistos: set[str] = set()
+        self.oferta_proactiva: dict | None = None
 
     def registrar(self, evento: str, **datos) -> None:
         EVENTOS.append({"sesion": self.id, "evento": evento, "turno": self.turnos, **datos})
+
+    def nombre_evento(self, servicio: str, distrito: str, tipo: str = "",
+                      canal: str = "") -> tuple[str, str]:
+        """
+        (título, lugar) con que aparecerá la cita en el calendario.
+
+        El estudiante elige cuánto se ve. El estilo neutro conserva la sede y
+        el canal, porque son necesarios para llegar y no revelan el motivo: el
+        campus entero comparte esa información. Lo que se oculta es el nombre
+        del servicio, que es lo único que delata a qué se asistió.
+        """
+        lugar = nombre_sede(distrito)
+        if canal and canal != "Aethera":
+            lugar = f"{lugar} · {canal.lower()}"
+
+        if self.estilo_evento == "neutro":
+            return "Cita campus", lugar
+        if self.estilo_evento == "servicio":
+            return servicio, lugar
+        return f"{servicio} · {tipo or ''}".strip(" ·"), lugar
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -121,18 +176,26 @@ def reservar(sesion: Sesion, numero_opcion: int) -> dict:
 
     fecha = date.fromisoformat(opcion["fecha"])
     hora_ini = a_minutos(opcion["hora"].split("–")[0])
+    titulo_evento, lugar = sesion.nombre_evento(
+        opcion["servicio"], opcion["distrito"], opcion.get("tipo", ""), opcion.get("canal", ""))
     sesion.reserva = {
         **opcion,
         "reserva_id": f"R-{len(_RESERVAS) + 1:04d}",
         "student_id": sesion.perfil["student_id"],
         "reservada_el": C.FECHA_DEMO,
         "dias_hasta_reserva": (fecha - date.fromisoformat(C.FECHA_DEMO)).days,
+        # Entrada de calendario tal como la ve un tercero.
+        "evento_titulo": titulo_evento,
+        "evento_lugar": lugar,
+        "evento_estilo": sesion.estilo_evento,
         "recordatorios": [
             f"{(fecha - timedelta(days=1)).isoformat()} 19:00",
             f"{opcion['fecha']} {a_hhmm(hora_ini - 120)}",
         ],
     }
     _RESERVAS.append(sesion.reserva)
+    sesion.registrar("reserva_confirmada", canal=opcion["canal"],
+                     estilo_evento=sesion.estilo_evento)
     return {"ok": True, "reserva": sesion.reserva}
 
 
@@ -356,6 +419,84 @@ def ejecutar(plan: dict, texto: str, sesion: Sesion) -> dict:
 # ─────────────────────────────────────────────────────────────────────────────
 # Turno completo
 # ─────────────────────────────────────────────────────────────────────────────
+def _acotar_al_evento(ops: dict, oferta: dict) -> dict:
+    """
+    Prioriza los turnos que caen dentro de la semana institucional que motivó
+    la oferta.
+
+    Si el mensaje dice "te busco un apoyo con esa fecha en mente" y el primer
+    turno es dos semanas después, la promesa no se cumple y el estudiante
+    pierde la razón para aceptar la cita. Si no hay ningún turno en la ventana,
+    se devuelve la lista original: es preferible ofrecer algo posterior que no
+    ofrecer nada.
+    """
+    desde = date.fromisoformat(oferta["evento_fecha"])
+    hasta = date.fromisoformat(oferta["evento_hasta"]) + timedelta(days=DIAS_GRACIA_EVENTO)
+    dentro = [o for o in ops["opciones"]
+              if desde <= date.fromisoformat(o["fecha"]) <= hasta]
+    if dentro:
+        ops = {**ops, "opciones": dentro}
+    return ops
+
+
+def ofrecer_proactivamente(sesion: Sesion) -> tuple[str | None, dict | None]:
+    """
+    Ruta inicia la conversación si encuentra un momento que lo justifique.
+
+    Se usa en dos momentos: al registrar el día en Pulse y al abrir Ruta con la
+    agenda ya cargada. Si no hay nada que ofrecer, devuelve (None, None) y la
+    interfaz se comporta exactamente como antes.
+
+    Solo usa datos del propio estudiante y el calendario institucional, que es
+    común a toda la comunidad. Nunca infiere ni comunica nada sobre terceros.
+    """
+    from . import disparadores
+
+    oferta = disparadores.evaluar(sesion)
+    if not oferta:
+        return None, None
+
+    motivo = oferta["motivo"]
+    ops = servicios.proponer_opciones(sesion.perfil, motivo, sesion.agenda, n=6)
+    if oferta["tipo"] == "evento":
+        ops = _acotar_al_evento(ops, oferta)
+    ops["opciones"] = ops["opciones"][:3]
+    for i, o in enumerate(ops["opciones"], start=1):
+        o["opcion"] = i
+    if not ops["opciones"]:
+        return None, None
+
+    sesion.motivo = motivo
+    sesion.opciones = ops["opciones"]
+
+    cuerpo = (disparadores.texto_oferta(oferta) + "\n\n"
+              "Estas son las que calzan con tu horario:\n" + lista_opciones(ops["opciones"])
+              + "\n\n¿Cuál te acomoda? Responde con el número.")
+    intro = "" if sesion.presentado else (
+        "Soy Ruta, un asistente de IA de orientación (no clínica). ")
+
+    resultados = {"clasificar": {"etiqueta": C.MOTIVOS[motivo],
+                                 "origen": "disparador proactivo",
+                                 "detalle": {k: v for k, v in oferta.items() if k != "frase"}},
+                  "voces": voces_de_aethera(motivo),
+                  "proponer_opciones": ops}
+    sesion.historial.append({"rol": "ruta", "texto": intro + cuerpo})
+    sesion.trazas.append({
+        "turno": sesion.turnos + 1, "mensaje": "(iniciativa de Ruta)",
+        "guardrail_entrada": "permitido", "accion": "orientar",
+        "plan": {"accion": "orientar", "motivo": motivo, "senal_de_riesgo": False},
+        "disparador": (f"{oferta['evento']} (D7, común a toda la comunidad)"
+                       if oferta["tipo"] == "evento"
+                       else f"{oferta['dias_pesados']} días difíciles en Pulse (propio)"),
+        "herramientas": ["disparador", "proponer_opciones"], "resultados": resultados,
+        "redaccion": "plantilla con disparador", "guardrail_salida": "ok", "segundos": 0})
+    sesion.turnos += 1
+    sesion.presentado = True
+    sesion.oferta_proactiva = oferta
+    sesion.registrar("oferta_proactiva", tipo=oferta["tipo"], motivo=motivo)
+    return intro + cuerpo, oferta
+
+
 def procesar_mensaje(sesion: Sesion, texto: str) -> tuple[str, dict]:
     t0 = time.time()
     traza = {"turno": sesion.turnos + 1, "mensaje": texto}

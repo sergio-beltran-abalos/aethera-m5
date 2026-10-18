@@ -62,14 +62,14 @@ CSS_COMPACTO = """
 @page { size: A4; margin: 7mm 8mm; }
 * { box-sizing: border-box; }
 body { font-family: 'Segoe UI', Inter, system-ui, sans-serif;
-       color: #14213D; font-size: 6.7pt; line-height: 1.19; margin: 0; }
+       color: #14213D; font-size: 6.7pt; line-height: 1.16; margin: 0; }
 h1 { font-size: 11.5pt; font-weight: 700; letter-spacing: -.3px; margin: 0 0 1pt;
      color: #0E7C86; line-height: 1.1; }
-h2 { font-size: 7.8pt; font-weight: 700; margin: 3.6pt 0 1.4pt; padding-bottom: 1pt;
+h2 { font-size: 7.8pt; font-weight: 700; margin: 2.6pt 0 1.2pt; padding-bottom: .8pt;
      border-bottom: 1px solid #0E7C86; color: #14213D; page-break-after: avoid;
      text-transform: uppercase; letter-spacing: .4pt; }
 h1 + p { color: #5B6B80; font-size: 6.6pt; margin: 0 0 2pt; }
-p { margin: 1.4pt 0; }
+p { margin: 1.1pt 0; }
 hr { border: 0; border-top: 1px solid #DCE3EA; margin: 4pt 0; }
 strong { color: #0A5F68; font-weight: 700; }
 code { background: #F1F5F8; color: #0A5F68; padding: 0 2px; border-radius: 2px;
@@ -77,14 +77,14 @@ code { background: #F1F5F8; color: #0A5F68; padding: 0 2px; border-radius: 2px;
 pre { background: #F7FAFB; border: 1px solid #DCE3EA; border-left: 2px solid #0E7C86;
       padding: 4pt 6pt; font-size: 6.2pt; line-height: 1.3; white-space: pre-wrap;
       margin: 3pt 0; page-break-inside: avoid; }
-table { border-collapse: collapse; width: 100%; margin: 3pt 0; font-size: 6.2pt;
+table { border-collapse: collapse; width: 100%; margin: 2.4pt 0; font-size: 6.2pt;
         page-break-inside: avoid; }
-th { background: #0E7C86; color: #fff; text-align: left; padding: 1.5pt 2.6pt;
+th { background: #0E7C86; color: #fff; text-align: left; padding: 1.2pt 2.4pt;
      font-weight: 600; border: 1px solid #0A5F68; }
-td { padding: 1.5pt 2.6pt; border: 1px solid #DCE3EA; vertical-align: top; }
+td { padding: 1.2pt 2.4pt; border: 1px solid #DCE3EA; vertical-align: top; }
 tr:nth-child(even) td { background: #F7FAFB; }
-ul, ol { margin: 1.8pt 0; padding-left: 10pt; }
-li { margin: 0.6pt 0; }
+ul, ol { margin: 1.4pt 0; padding-left: 10pt; }
+li { margin: 0.4pt 0; }
 em { color: #5B6B80; }
 a { color: #0E7C86; text-decoration: none; }
 """

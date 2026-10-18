@@ -119,6 +119,7 @@ revisar("html_frase (sin consent)", vistas.html_frase({"error": "acepta el aviso
 revisar("html_bienestar", vistas.html_bienestar())
 revisar("html_panel_traza (vacio)", vistas.html_panel_traza(sesion))
 revisar("tabla_reservas", vistas.tabla_reservas_html())
+revisar("html_estilo_evento", vistas.html_estilo_evento())
 
 r = pulso.registrar(sesion, "regular", ["Descanso"], "")
 revisar("html_frase (con resultado)", vistas.html_frase(r))
@@ -127,6 +128,22 @@ for msg in ["¿Qué apoyos hay?", "Trabajo de día y estoy solo", "1", "ya no qu
     agente.procesar_mensaje(sesion, msg)
 revisar("html_panel_traza (con turnos)", vistas.html_panel_traza(sesion))
 revisar("html_bienestar (con actividad)", vistas.html_bienestar())
+
+# El turno proactivo no pasa por el LLM: su traza tiene menos campos y el panel
+# debe saber renderizarla sin romperse.
+from aethera import disparadores, servicios  # noqa: E402
+
+s2 = agente.Sesion(tarjetas_demo()[list(tarjetas_demo())[0]], "A", servicios.Agenda())
+s2.consentimiento_pulse = True
+s2.mood_track = pulso.historial_ejemplo("A")
+_, oferta = agente.ofrecer_proactivamente(s2)
+revisar("html_panel_traza (turno proactivo)", vistas.html_panel_traza(s2))
+revisar("tabla_reservas (con cita)", vistas.tabla_reservas_html())
+if oferta:
+    print(f"    el panel declara el disparador: "
+          f"{'SI' if 'D7' in vistas.html_panel_traza(s2) or 'Pulse' in vistas.html_panel_traza(s2) else 'NO'}")
+else:
+    fallos.append("no se genero turno proactivo para revisar el panel")
 
 print("\n" + "=" * 74)
 if fallos:

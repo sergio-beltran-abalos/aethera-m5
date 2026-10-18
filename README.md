@@ -60,6 +60,16 @@ visible.
 servicios y calendario, y propone tres citas que no chocan con las clases, el trabajo ni el
 tiempo de traslado del estudiante. Reserva, reprograma y escala a una persona.
 
+Ruta también **escribe primero** cuando encuentra un momento que lo justifica: si la semana
+de pausa y bienestar está a menos de siete días, o si el propio estudiante registró tres o
+más días difíciles en la semana. Nunca lo hace sin consentimiento, nunca insiste y nunca usa
+un aviso distinto según el estado de ánimo de cada quien.
+
+Cada cita aparece en el calendario del estudiante con el **título que él elige**. Por defecto
+es neutro («Cita campus»): no nombra el servicio, que es lo único que delata a qué se
+acudió. Sede, fecha, hora y canal siguen visibles, y el detalle completo permanece dentro de
+la aplicación.
+
 **Bienestar** — Vista agregada para el equipo de bienestar. Toda celda con menos de
 **10 personas** se suprime. Los estados de ánimo individuales nunca se agregan.
 
@@ -149,7 +159,7 @@ sobre D5 y plantillas de respaldo: la funcionalidad completa, con menor calidad 
 
 | | |
 |---|---|
-| **Equipo** | Aethera Pulse + Ruta |
+| **Equipo** | Grupo 3 Pulse + Ruta |
 | **Institución objetivo** | UNI_NOVA_AETHER (ver §5, escalabilidad) |
 | **Contacto** | Sergio Edmundo Beltran Abalos · sergio.beltran@utec.edu.pe |
 
@@ -241,9 +251,10 @@ src/aethera/
   servicios.py    Agenda simulada, ranking y propuesta de citas
   ml.py           Modelo de asistencia + clasificador de necesidad
   calendario.py   D7 y eventos pertinentes
+  disparadores.py Iniciativa de Ruta: qué la hace escribir primero
   guardrails.py   Guardrails de entrada y salida
   ia.py           Capa de LLM con respaldos
-  agente.py       Orquestación del turno y herramientas
+  agente.py       Orquestación del turno, herramientas y privacidad de la cita
   pulso.py        Check-in, consentimiento, ARCO
   bienestar.py    Agregados y KPIs
   evaluacion.py   Los tres experimentos
@@ -251,6 +262,7 @@ src/aethera/
   ui.py           Gradio
 docs/            Ficha de IA responsable, impacto, costos
 tests/           Pruebas de humo
+tools/           Conversor Markdown → PDF
 data/            Data Pack (no redistribuir)
 ```
 

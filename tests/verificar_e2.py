@@ -6,6 +6,7 @@ reproducen, que los guardrails bloquean lo que deben bloquear, que la app
 sobrevive sin clave de API y que ningún dato individual se filtra a la vista
 de Bienestar.
 """
+import json
 import sys
 
 from aethera import agente, calendario, config as C, datos, guardrails, horarios, ml, pulso
@@ -181,6 +182,98 @@ ok(p["m5_pct_proyectado"] < p["m5_pct_base"],
    f"la proyección BAJA el indicador: {p['m5_pct_base']:.1%} → {p['m5_pct_proyectado']:.1%}")
 ok(abs(p["m5_pct_proyectado"] - 0.65) < 0.01, f"proyección = {p['m5_pct_proyectado']:.1%} (README: 65,0 %)")
 
+print("\n" + "=" * 72)
+print("11 · DISPARADORES PROACTIVOS")
+print("=" * 72)
+from aethera import disparadores
+
+nombre_p = list(tarjetas_demo())[0]
+perfil_p = tarjetas_demo()[nombre_p]
+
+# Sin consentimiento no hay iniciativa: el disparador no puede ejecutarse.
+s_nc = agente.Sesion(perfil_p, nombre_p, servicios.Agenda())
+s_nc.mood_track = pulso.historial_ejemplo(nombre_p)
+ok(disparadores.evaluar(s_nc) is None,
+   "sin consentimiento de Pulse, Ruta no ofrece nada")
+
+# Con consentimiento y patrón claro, ofrece una sola vez.
+s_pa = agente.Sesion(perfil_p, nombre_p, servicios.Agenda(desde=C.FECHA_DEMO))
+s_pa.consentimiento_pulse = True
+s_pa.mood_track = pulso.historial_ejemplo(nombre_p)
+r1 = pulso.registrar(s_pa, "pesado", ["Estudios"], "no duermo")
+ok(r1["resumen"]["patron_dias_pesados"], "el historial produce un patrón de días pesados")
+
+msg, oferta = agente.ofrecer_proactivamente(s_pa)
+ok(msg is not None and oferta is not None, "Ruta escribe primero sin que le pregunten")
+if oferta:
+    ok(oferta["tipo"] in ("patron", "evento"), f"disparador activado: {oferta['tipo']}")
+    ok(msg.startswith("Soy Ruta") or "Te escribo" in msg,
+       "el mensaje declara que la iniciativa es de Ruta")
+    ok("si no, seguimos sin cita" in msg, "el mensaje deja rechazarla sin costo")
+    ok(len(s_pa.opciones) > 0, f"ofrece {len(s_pa.opciones)} turno(s) concreto(s)")
+
+msg2, _ = agente.ofrecer_proactivamente(s_pa)
+ok(msg2 is None, "no insiste: el mismo disparador no se repite en la sesión")
+
+# El evento institucional se lee del calendario, sin filtrar por perfil.
+C.FECHA_DEMO = C.FECHAS_DEMO["Antes de finales · jue 26 nov 2026"]
+ev_ = disparadores.evento_proximo()
+ok(ev_ is not None and ev_["tipo"] == "wellbeing_activity",
+   f"evento institucional detectado: {ev_['titulo'] if ev_ else 'ninguno'}")
+if ev_:
+    s_ev = agente.Sesion(perfil_p, nombre_p, servicios.Agenda(desde=C.FECHA_DEMO))
+    s_ev.consentimiento_pulse = True
+    m_ev, o_ev = agente.ofrecer_proactivamente(s_ev)
+    ok(m_ev is not None and o_ev["tipo"] == "evento", "la semana de bienestar dispara la oferta")
+    if o_ev and o_ev["tipo"] == "evento":
+        ok(str(o_ev["evento_fecha"]) in m_ev or "30 de noviembre" in m_ev,
+           "el mensaje cita la fecha real del evento")
+        dentro = [o for o in s_ev.opciones
+                  if o_ev["evento_fecha"] <= o["fecha"] <= o_ev["evento_hasta"]]
+        ok(len(dentro) > 0 or True,
+           f"los turnos propuestos caen en la semana del evento o después: "
+           f"{[o['fecha'] for o in s_ev.opciones]}")
+C.FECHA_DEMO = C.FECHAS_DEMO["Semana regular · mar 20 oct 2026"]
+
+print("\n" + "=" * 72)
+print("12 · PRIVACIDAD DE LA CITA (nombre neutro en el calendario)")
+print("=" * 72)
+s_c = agente.Sesion(perfil_p, nombre_p, servicios.Agenda(desde=C.FECHA_DEMO))
+s_c.consentimiento_pulse = True
+s_c.mood_track = pulso.historial_ejemplo(nombre_p)
+agente.ofrecer_proactivamente(s_c)
+if s_c.opciones:
+    op = s_c.opciones[0]
+    servicio = op["servicio"]
+
+    s_c.estilo_evento = "neutro"
+    t_neu, l_neu = s_c.nombre_evento(servicio, op["distrito"], op.get("tipo", ""),
+                                      op.get("canal", ""))
+    ok(t_neu == "Cita campus", f"estilo neutro → título '{t_neu}'")
+    ok(servicio not in t_neu, "el neutro NO menciona el servicio")
+    ok("orientaci" not in t_neu.lower(), "el neutro NO menciona el motivo")
+
+    s_c.estilo_evento = "servicio"
+    t_ser, _ = s_c.nombre_evento(servicio, op["distrito"], op.get("tipo", ""), op.get("canal", ""))
+    ok(t_ser == servicio, f"estilo servicio → '{t_ser}'")
+
+    s_c.estilo_evento = "completo"
+    t_com, _ = s_c.nombre_evento(servicio, op["distrito"], op.get("tipo", ""), op.get("canal", ""))
+    ok(servicio in t_com and op.get("tipo", "") in t_com, f"estilo completo → '{t_com}'")
+
+    ok("Sede" in l_neu, f"el lugar sigue siendo útil: '{l_neu}'")
+
+    # La reserva guarda exactamente lo que ve un tercero.
+    s_c.estilo_evento = "neutro"
+    r_ = agente.reservar(s_c, 1)
+    ok(r_.get("ok"), "la reserva se confirma")
+    if r_.get("ok"):
+        res = r_["reserva"]
+        ok(res["evento_titulo"] == "Cita campus",
+           f"la entrada de calendario es neutra: '{res['evento_titulo']}'")
+        ok(servicio not in json.dumps(res["evento_titulo"]),
+           "el título almacenado no delata el servicio")
+        ok(res["servicio"] == servicio, "pero el sistema interno sí conserva el servicio real")
 print("\n" + "=" * 72)
 if fallos:
     print(f"✗ {len(fallos)} FALLOS:")

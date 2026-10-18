@@ -67,13 +67,52 @@ def _consentir(acepta: bool, con_historial: bool, sesion):
     return vistas.html_mood_track(sesion), vistas.html_frase(), sesion
 
 
-def _registrar(id_mood: str, temas, nota: str, sesion):
+def _registrar(id_mood: str, temas, nota: str, sesion, estilo_evento: str, chat):
     import gradio as gr
     if not id_mood:
         gr.Warning("Elige cómo te sientes hoy.")
-        return vistas.html_frase(), vistas.html_mood_track(sesion), sesion
+        return vistas.html_frase(), vistas.html_mood_track(sesion), sesion, chat
+
+    sesion.estilo_evento = estilo_evento or "neutro"
     resultado = pulso.registrar(sesion, id_mood, temas or [], nota)
-    return (vistas.html_frase(resultado), vistas.html_mood_track(sesion), sesion)
+
+    # Un check-in también puede activar crisis: la UI debe derivar igual.
+    if resultado.get("crisis"):
+        sesion.oferta_contacto = True
+
+    # Ruta puede escribir primero si el momento lo justifica.
+    chat, sesion = _ofrecer(sesion, chat)
+    return (vistas.html_frase(resultado), vistas.html_mood_track(sesion),
+            sesion, chat)
+
+
+def _ofrecer(sesion, chat):
+    """Añade el turno proactivo al chat si corresponde. Devuelve (chat, sesion)."""
+    mensaje, _ = agente.ofrecer_proactivamente(sesion)
+    if not mensaje:
+        return chat, sesion
+    return (chat or []) + [{"role": "assistant", "content": mensaje}], sesion
+
+
+def _abrir_chat(sesion, chat, estilo_evento):
+    import gradio as gr
+    sesion.estilo_evento = estilo_evento or "neutro"
+
+    # Si hay un disparador pendiente se respeta ese turno: el estudiante no
+    # tiene por qué preguntar para que el sistema le ofrezca una cita.
+    chat, sesion = _ofrecer(sesion, chat)
+    if sesion.oferta_proactiva:
+        return chat, sesion, vistas.html_panel_traza(sesion)
+
+    if not any(e["fecha"] == C.FECHA_DEMO for e in sesion.mood_track):
+        gr.Warning("Registra tu día en Pulse primero, o cuéntame directo aquí.")
+        return chat, sesion, vistas.html_panel_traza(sesion)
+
+    return ((chat or []) + [{"role": "assistant", "content": pulso.abrir_chat(sesion)}],
+            sesion, vistas.html_panel_traza(sesion))
+
+
+
 
 
 def _borrar(sesion):
@@ -91,14 +130,7 @@ def _descargar(sesion):
     return pulso.exportar(sesion)
 
 
-def _abrir_chat(sesion, chat):
-    import gradio as gr
-    if not any(e["fecha"] == C.FECHA_DEMO for e in sesion.mood_track):
-        gr.Warning("Registra tu día en Pulse antes, o escribe directo en la pestaña Ruta.")
-        return chat, sesion, vistas.html_panel_traza(sesion)
-    texto = pulso.abrir_chat(sesion)
-    return (chat or []) + [{"role": "assistant", "content": texto}], \
-        sesion, vistas.html_panel_traza(sesion)
+
 
 
 def _enviar(texto: str, sesion, chat):
@@ -175,6 +207,12 @@ def construir():
 
                     with gr.Column(scale=6, elem_classes="panel"):
                         track = gr.HTML()
+                        with gr.Accordion("Privacidad de la cita", open=False):
+                            gr.HTML(vistas.html_estilo_evento())
+                            estilo_evento = gr.Radio(
+                                [(s["etiqueta"], s["clave"]) for s in vistas.ESTILOS_EVENTO],
+                                value="neutro", label="Cómo quieres que aparezca en tu calendario",
+                                info="No cambia la cita: cambia lo que ven los demás.")
                         with gr.Row():
                             btn_descargar = gr.Button("Descargar mi registro", size="sm")
                             btn_borrar = gr.Button("Borrar mi registro", size="sm", variant="stop")
@@ -244,8 +282,9 @@ def construir():
 
         consentimiento.input(_consentir, [consentimiento, chk_historial, estado],
                              [track, frase, estado])
-        btn_registrar.click(_registrar, [mood, temas, nota, estado], [frase, track, estado])
-        btn_hablar.click(_abrir_chat, [estado, chat], [chat, estado, panel])
+        btn_registrar.click(_registrar, [mood, temas, nota, estado, estilo_evento, chat],
+                            [frase, track, estado, chat])
+        btn_hablar.click(_abrir_chat, [estado, chat, estilo_evento], [chat, estado, panel])
         btn_borrar.click(_borrar, [estado], [track, frase, estado, archivo])
         btn_descargar.click(_descargar, [estado], [archivo])
         entrada.submit(_enviar, [entrada, estado, chat],

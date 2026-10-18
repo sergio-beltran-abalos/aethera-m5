@@ -41,6 +41,23 @@ for k, v in requeridos.items():
 if faltantes:
     rotos.append(("estructura", ", ".join(faltantes)))
 
+# La ficha de IA responsable debe ocupar una sola pagina: es el formato que piden
+# las bases y no se negocia. Cada edicion anade texto, asi que se comprueba.
+print("\nFormato de la ficha de IA responsable:")
+PAGINAS_MAXIMAS = {"FICHA_IA_RESPONSABLE.pdf": 1}
+for nombre, maximo in PAGINAS_MAXIMAS.items():
+    ruta = RAIZ / nombre
+    if not ruta.exists():
+        print(f"  {nombre:32} FALTA")
+        rotos.append(("pdf", nombre))
+        continue
+    bruto = ruta.read_bytes()
+    paginas = len(re.findall(rb"/Type\s*/Page[^s]", bruto))
+    estado = "OK" if paginas <= maximo else f"{paginas} paginas (maximo {maximo})"
+    print(f"  {nombre:32} {paginas} pag  {estado}")
+    if paginas > maximo:
+        rotos.append((nombre, f"{paginas} paginas, maximo {maximo}"))
+
 if rotos:
     sys.exit(1)
-print("\nTodos los enlaces resuelven y la estructura es completa.")
+print("\nTodos los enlaces resuelven, la estructura esta completa y los PDF cumplen formato.")

@@ -32,6 +32,21 @@ TEXTO_SUAVE = "#5B6B80"
 ALERTA = "#C0534F"
 EXITO = "#2E8B6F"
 
+# Estilos de la entrada de calendario. El estudiante elige cuánto se ve.
+# Fuente única: la usan el selector de la interfaz y la tabla de reservas.
+ESTILOS_EVENTO = [
+    {"clave": "neutro", "etiqueta": "🔒 Neutro — «Cita campus»",
+     "ejemplo": "Cita campus · Edificio Norte",
+     "nota": "Lo verás con todos los detalles dentro de la aplicación. Fuera de ella, "
+             "solo aparece como cita en el campus."},
+    {"clave": "servicio", "etiqueta": "Equilibrado — nombre del servicio",
+     "ejemplo": "Espacio Lumen · Edificio Norte",
+     "nota": "Quien vea tu calendario sabrá a qué servicio acudes, pero no el motivo."},
+    {"clave": "completo", "etiqueta": "Completo — servicio y lugar",
+     "ejemplo": "Espacio Lumen · Orientación emocional",
+     "nota": "Sin ocultamiento. Es la opción con más exposición."},
+]
+
 CSS = f"""
 :root {{
   --tinta: {TINTA}; --primario: {PETROLEO}; --primario-osc: {PETROLEO_OSC};
@@ -345,20 +360,33 @@ def html_panel_traza(sesion) -> str:
     t = sesion.trazas[-1]
     L = [f"**Turno {t['turno']}** · {t['segundos']} s",
          f"- 🛡️ **Entrada** · `{t['guardrail_entrada']}`"]
-    if "plan" in t:
-        L.append(f"- 🧭 **Acción** · `{t['accion']}` _(decidida por {t['plan']['metodo']})_")
+    # El metodo solo existe si el planificador intervino: un turno proactivo no
+    # pasa por el LLM, y el panel debe decirlo en vez de romper la vista.
+    metodo = (t.get("plan") or {}).get("metodo")
+    if metodo:
+        L.append(f"- 🧭 **Acción** · `{t['accion']}` _(decidida por {metodo})_")
+    elif t.get("plan"):
+        L.append(f"- 🧭 **Acción** · `{t['accion']}` _(regla, sin LLM)_")
     else:
         L.append(f"- 🧭 **Acción** · `{t['accion']}`")
 
     res = t.get("resultados", {})
     if "clasificar" in res:
         c = res["clasificar"]
-        L.append(f"- 🏷️ **Necesidad** · `{c['reason_code']}` "
-                 f"(confianza {c['confianza']:.2f}, vía {c['metodo']})")
+        # reason_code y confianza los aporta el LLM; el disparador proactivo
+        # decide el motivo por regla, asi que se muestran solo si existen.
+        if c.get("reason_code"):
+            L.append(f"- 🏷️ **Necesidad** · `{c['reason_code']}` "
+                     f"(confianza {c.get('confianza', 0):.2f}, vía {c.get('metodo', 'regla')})")
+        else:
+            L.append(f"- 🏷️ **Necesidad** · `{c.get('etiqueta', 'sin clasificar')}` "
+                     f"_(elegida por regla)_")
     if "evento_relevante" in res.get("consultar_calendario", {}):
         e = res["consultar_calendario"]["evento_relevante"]
         L.append(f"- 📅 **D7** · {e['titulo']} ({e['desde']})" if e
                  else "- 📅 **D7** · sin evento pertinente, no se menciona")
+    elif t.get("disparador"):
+        L.append(f"- 📅 **D7** · {t['disparador']}")
     if "voces" in res:
         v = res["voces"]
         L.append(f"- 🗣️ **D4 agregado** · {v['proporcion']:.0%} de {v['relatos_nova']:,} "
@@ -389,6 +417,28 @@ def html_panel_traza(sesion) -> str:
     return "\n".join(L)
 
 
+def html_estilo_evento() -> str:
+    """Explicación del control de privacidad de la cita."""
+    filas = "".join(
+        f'<tr style="border-bottom:1px solid {BORDE}">'
+        f'<td style="padding:8px 6px;font-size:12.5px;font-weight:600;color:{PETROLEO};'
+        f'white-space:nowrap">{s["etiqueta"]}</td>'
+        f'<td style="padding:8px 6px;font-size:12.5px;color:{TEXTO_SUAVE}">{s["nota"]}</td>'
+        f'</tr>' for s in ESTILOS_EVENTO)
+    return f"""
+    <div class="subtitulo" style="margin-bottom:8px">
+      Tu cita aparece en tu calendario con el título que elijas aquí. Dentro de la
+      aplicación siempre ves el detalle completo: el nombre neutro solo cambia lo
+      que un tercero alcanza a leer.</div>
+    <table style="border-collapse:collapse;width:100%">
+      <tr style="border-bottom:2px solid {BORDE}">
+        <th style="text-align:left;padding:6px;font-size:11px;color:{TEXTO_SUAVE};
+          text-transform:uppercase;letter-spacing:.4px">Cómo se ve</th>
+        <th style="text-align:left;padding:6px;font-size:11px;color:{TEXTO_SUAVE};
+          text-transform:uppercase;letter-spacing:.4px">Qué implica</th></tr>
+      {filas}</table>"""
+
+
 def tabla_reservas_html() -> str:
     from .agente import _RESERVAS
     if not _RESERVAS:
@@ -401,6 +451,9 @@ def tabla_reservas_html() -> str:
         f'<td style="padding:8px 6px;font-size:12.5px">{r["dia"]} {r["fecha"]}</td>'
         f'<td style="padding:8px 6px;font-size:12.5px">{r["hora"]}</td>'
         f'<td style="padding:8px 6px;font-size:12.5px">{r["servicio"]}</td>'
+        f'<td style="padding:8px 6px;font-size:12.5px">'
+        f'<code style="font-size:11.5px;background:{CANVAS};padding:2px 6px;'
+        f'border-radius:6px">{r.get("evento_titulo", r["servicio"])}</code></td>'
         f'<td style="padding:8px 6px;font-size:12.5px">{r["canal"]}</td></tr>'
         for r in _RESERVAS)
     return f"""
@@ -414,6 +467,8 @@ def tabla_reservas_html() -> str:
           text-transform:uppercase;letter-spacing:.4px">Hora</th>
         <th style="text-align:left;padding:6px;font-size:11px;color:{TEXTO_SUAVE};
           text-transform:uppercase;letter-spacing:.4px">Servicio</th>
+        <th style="text-align:left;padding:6px;font-size:11px;color:{TEXTO_SUAVE};
+          text-transform:uppercase;letter-spacing:.4px">En tu calendario</th>
         <th style="text-align:left;padding:6px;font-size:11px;color:{TEXTO_SUAVE};
           text-transform:uppercase;letter-spacing:.4px">Canal</th></tr>
       {filas}</table>"""

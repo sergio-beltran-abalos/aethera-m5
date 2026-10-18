@@ -31,7 +31,7 @@ un bloque de la estructura.
 |---|---|---|---|
 | 1 · Diagnóstico | 0:00 – 0:40 | Indicador de la misión y su causa más probable | 68,2 % · 62 % fuera de horario · 50 % nocturno |
 | 2 · Población | 0:40 – 1:05 | Segmento prioritario y caso representativo | 826 estudiantes · agenda del perfil |
-| 3 · Funcionamiento | 1:05 – 2:35 | Ejecución del prototipo de punta a punta | Consentimiento, registro de ánimo, propuesta, reserva |
+| 3 · Funcionamiento | 1:05 – 2:35 | Ejecución del prototipo de punta a punta | Consentimiento, registro de ánimo, propuesta, reserva, cita con título neutro |
 | 4 · Resultados | 2:35 – 3:10 | Evaluación offline y proyección sobre el indicador | 370 turnos · mediana 0 viables · 68,2 % → 65,0 % |
 | 5 · Alcance y límites | 3:10 – 3:45 | Supervisión humana y límites del modelo | Protocolo de crisis · AUC declarada |
 | 6 · Cierre | 3:45 – 4:00 | Encuadre del alcance del producto | — |
@@ -69,16 +69,27 @@ solución debe resolver.
 | Paso | Acción | Evidencia |
 |---|---|---|
 | 3.1 | Activación del consentimiento y registro del estado de ánimo | La interfaz rechaza el registro sin consentimiento previo |
-| 3.2 | Descripción de una necesidad en lenguaje cotidiano | Tres citas propuestas con fecha, hora, servicio y canal |
+| 3.2 | Ruta escribe primero: registra los días difíciles de la semana y ofrece un espacio sin que se le pregunte | El turno aparece en el chat con la marca de que la iniciativa es de Ruta |
 | 3.3 | Selección y confirmación de una cita | Código de reserva y recordatorios programados |
+| 3.4 | Apertura de «Privacidad de la cita» y elección del estilo neutro | La tabla de reservas muestra «Cita campus» en la columna del calendario |
+
+**Fecha de demostración para el paso 3.2.** El disparador de evento institucional se
+activa con la fecha **«Antes de finales · jue 26 nov 2026»**, que deja la semana de pausa y
+bienestar a cuatro días. Con la fecha regular del 20 de octubre el disparador que se
+demuestra es el del patrón de días pesados, que también funciona.
 
 **Verificación en pantalla.** El panel «Cómo decidió Ruta» permanece visible durante todo el
 bloque, mostrando la acción decidida, el motivo clasificado, las herramientas invocadas y
 la procedencia de cada dato.
 
-**Observación relevante para el jurado.** Las tres citas propuestas se ubican invariablemente
-en la franja libre del estudiante. Esta restricción es verificable a simple vista y constituye
-la contribución técnica central del proyecto.
+**Observación relevante para el jurado.** Dos hechos se comprueban a simple vista:
+
+1. Las tres citas propuestas se ubican invariablemente en la franja libre del estudiante.
+   Esta restricción es verificable a ojo y constituye la contribución técnica central.
+2. La reserva aparece como **«Cita campus»** en la columna del calendario, sin nombrar el
+   servicio. El sistema conserva internamente el servicio real, pero la entrada que ve un
+   tercero no lo delata. Este es el punto del video donde el jurado comprueba que la
+   privacidad es una mecánica y no una declaración.
 
 ### Bloque 4 · Resultados (2:35 – 3:10)
 

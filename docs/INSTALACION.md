@@ -206,13 +206,35 @@ no sustituye la experiencia con el modelo generativo en la demostración.
 python -m aethera.segmentos      # reconstrucción del embudo M5
 python -m aethera.ml             # modelos, métricas y límites
 python -m aethera.evaluacion     # los tres experimentos y el análisis de sensibilidad
-python tests/verificar_e2.py     # 60 comprobaciones de extremo a extremo
-python tests/revisar_docs.py     # integridad de la documentación
 ```
 
 La agenda de turnos se genera con una **semilla fija**, de modo que la demostración produce
 números idénticos en cada ejecución. Esta propiedad es deliberada: garantiza que el equipo de
 evaluación observe exactamente lo que observó el equipo autor.
+
+### Verificaciones automatizadas
+
+Ocho suites, todas ejecutables sin clave de API y sin conexión:
+
+```bash
+python tests/verificar_e2.py        # 78 comprobaciones de extremo a extremo
+python tests/verificar_handlers.py  # cada handler de la interfaz, con entradas reales
+python tests/verificar_ui.py        # la aplicación Gradio construye sin errores
+python tests/revisar_html.py        # todas las vistas generan HTML bien formado
+python tests/revisar_docs.py        # integridad textual de docs y código
+python tests/revisar_enlaces.py     # enlaces, estructura exigida y formato de los PDF
+python tests/escenario_tercero.py   # un tercero sin clave puede correr el repositorio
+python tests/auditar_publicacion.py # nada publicable filtra información sensible
+```
+
+Para ejecutarlas todas de una vez:
+
+```bash
+python tests/verificar_e2.py && python tests/verificar_handlers.py && \
+python tests/verificar_ui.py && python tests/revisar_html.py && \
+python tests/revisar_docs.py && python tests/revisar_enlaces.py && \
+python tests/escenario_tercero.py && python tests/auditar_publicacion.py
+```
 
 ## 9. Opciones de publicación
 

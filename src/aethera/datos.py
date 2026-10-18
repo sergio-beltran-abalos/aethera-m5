@@ -78,7 +78,7 @@ def cargar() -> dict:
         d5 = pd.DataFrame(json.load(f))
 
     # D3 es opcional en el sentido de arranque, pero se carga: aporta la carga
-    # académica que，用来 calibrar el bloque de clases (ver horarios.py).
+    # académica que se usa para calibrar el bloque de clases (ver horarios.py).
     ruta_d3 = _ruta("D3")
     d3 = pd.read_csv(ruta_d3) if ruta_d3.exists() else pd.DataFrame(columns=["student_id"])
 
